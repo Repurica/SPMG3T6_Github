@@ -1,11 +1,18 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from supabase_init import supabase
 
 
 sample = Blueprint('sample', __name__)
 
-@sample.route('/get_data')
-def get_data():
+@sample.route('/all_employee')
+def all_employee():
     data = supabase.table('employee').select("*").execute()
-    row1 = data.data[0]
-    return row1
+    
+    return {"result":data.data}
+
+@sample.route('/one_employee')
+def one_employee():
+    staff_id = request.args.get('id')
+    data = supabase.table('employee').select("*").eq('Staff_ID', staff_id).execute()
+    data.data
+    return {"result":data.data}
