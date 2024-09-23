@@ -13,7 +13,8 @@ app = Flask(__name__)
 from sample import sample
 app.register_blueprint(sample, url_prefix="/sample")
 
-
+from schedule import schedule
+app.register_blueprint(schedule, url_prefix="/schedule")
 
 
 @app.route('/')
