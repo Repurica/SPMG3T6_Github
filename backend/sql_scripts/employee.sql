@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS Employee
+DROP TABLE IF EXISTS Employee;
 
 CREATE TABLE Employee (
     Staff_ID INT PRIMARY KEY,  -- Staff ID for staff

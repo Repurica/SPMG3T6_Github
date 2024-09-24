@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS schedule
+DROP TABLE IF EXISTS schedule;
 
 CREATE TABLE schedule (
     Staff_ID INT NOT NULL,  -- Staff ID for staff
