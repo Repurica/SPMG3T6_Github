@@ -13,6 +13,6 @@ def all_employee():
 @sample.route('/one_employee')
 def one_employee():
     staff_id = request.args.get('id')
-    data = supabase.table('employee').select("*").eq('Staff_ID', staff_id).execute()
+    data = supabase.table('employee').select("*").eq('staff_id', staff_id).execute()
     data.data
     return {"result":data.data}
