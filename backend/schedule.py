@@ -6,15 +6,16 @@ schedule = Blueprint('schedule', __name__)
 
 @schedule.route('/all_employee')
 def all_employee():
-    # data = supabase.table('employee').select("*").execute()
+    # data = supabase.table('test_employee').select("*").execute()
     
     # return {"result":data.data}
     pass
 
-@schedule.route('/one_employee')
+@schedule.route('/one_schedule')
 def one_employee():
     # staff_id = request.args.get('id')
-    # data = supabase.table('employee').select("*").eq('Staff_ID', staff_id).execute()
+    # data = supabase.table('test_employee').select("*").eq('Staff_ID', staff_id).execute()
     # data.data
     # return {"result":data.data}
+
     pass
