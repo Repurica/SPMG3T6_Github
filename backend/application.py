@@ -33,8 +33,8 @@ def return_available_dates():
     staff_id = 140002
     staff_id_2 = 140003
     # extract from supabase the dates where the staff is WFH
-    data_recurring = supabase.table("application").select("starting_date","end_date").eq("staff_id",staff_id).eq("request_type","recurring").execute()
-    data_ad_hoc= supabase.table("application").select("starting_date").eq("staff_id",staff_id).eq("request_type","ad_hoc").execute() 
+    data_recurring = supabase.table("application").select("starting_date","end_date","timing").eq("staff_id",staff_id).eq("request_type","recurring").execute()
+    data_ad_hoc= supabase.table("application").select("starting_date","timing").eq("staff_id",staff_id).eq("request_type","ad_hoc").execute() 
     adhoc_results = data_ad_hoc.data   
     recurring_results = data_recurring.data
     results = []
@@ -43,14 +43,17 @@ def return_available_dates():
         print(result)
         start_date = result["starting_date"]
         end_date = result["end_date"]
+        wfh_timing = result["timing"]
         dates_list = get_dates_on_same_weekday(start_date,end_date)
         print(dates_list)
         for date in dates_list:
-            results.append(date.strftime("%Y-%m-%d"))
+            results.append({"date" : date.strftime("%Y-%m-%d"),
+                            "wfh_timing" : wfh_timing})
     # print(results)
     for result2 in adhoc_results:
         start_date = result2["starting_date"]
-        results.append(start_date)
+        wfh_timing_adhoc = result2["timing"]
+        results.append({"date" : start_date, "wfh_timing": wfh_timing_adhoc})
     return {"results": results}
 
 
