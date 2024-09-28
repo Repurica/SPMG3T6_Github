@@ -33,13 +33,14 @@ def return_available_dates():
     staff_id = 140002
     staff_id_2 = 140003
     # extract from supabase the dates where the staff is WFH
-    data_recurring = supabase.table("application").select("starting_date","end_date","timing").eq("staff_id",staff_id).eq("request_type","recurring").execute()
-    data_ad_hoc= supabase.table("application").select("starting_date","timing").eq("staff_id",staff_id).eq("request_type","ad_hoc").execute() 
-    adhoc_results = data_ad_hoc.data   
-    recurring_results = data_recurring.data
     results = []
     #looping through 
     try:
+      data_recurring = supabase.table("application").select("starting_date","end_date","timing").eq("staff_id",staff_id).eq("request_type","recurring").execute()
+      data_ad_hoc= supabase.table("application").select("starting_date","timing").eq("staff_id",staff_id).eq("request_type","ad_hoc").execute() 
+      adhoc_results = data_ad_hoc.data   
+      recurring_results = data_recurring.data
+      results = []
       for result in recurring_results:
         start_date = result["starting_date"]
         end_date = result["end_date"]
@@ -54,7 +55,7 @@ def return_available_dates():
         start_date = result2["starting_date"]
         wfh_timing_adhoc = result2["timing"]
         results.append({"date" : start_date, "wfh_timing": wfh_timing_adhoc})
-      return {"results": results}
+      return {"results": results}, 200
     except Exception as e:
        return {"results":results,
                "info" : repr(e)}, 500
@@ -65,10 +66,10 @@ def store_application():
     # json_sent = request.get_json()
     json_sent = { 
    "request_type" : "recurring",
-   "starting_date" : "2024-09-27",
-   "end_date" : "2024-10-11",
-   "reason" : "test reason",
-   "timing" : "PM",
+   "starting_date" : "2024-09-30",
+   "end_date" : "2024-10-7",
+   "reason" : "test reason 2",
+   "timing" : "AM",
    "staff_id" : 140002
 }   
     try:
