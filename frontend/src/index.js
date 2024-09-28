@@ -10,7 +10,7 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
     <App />
-
+    <SchedulerTest data={[]} isLoading={false} />
     </BrowserRouter>
   </React.StrictMode>
 );
