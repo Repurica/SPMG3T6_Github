@@ -1,38 +1,38 @@
-.App {
-  text-align: center;
+/* Make sure the body and html have a full height */
+body, html {
+  height: 100%;
+  margin: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Style for the NavBar */
+.navbar {
+  position: fixed;      /* Keep the navbar fixed */
+  bottom: 0;           /* Align it to the bottom */
+  left: 0;             /* Align to the left */
+  width: 100%;         /* Full width */
+  background-color: #4CAF50; /* Background color */
+  padding: 1rem;       /* Padding around the links */
+  z-index: 1000;       /* Ensure it stays on top */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.navbar ul {
+  list-style-type: none; /* No bullet points */
+  display: flex;         /* Flex display for horizontal alignment */
+  justify-content: center; /* Center the items */
+  margin: 0;            /* Remove default margin */
+  padding: 0;           /* Remove default padding */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.navbar ul li {
+  display: inline;       /* Inline display for list items */
 }
 
-.App-link {
-  color: #61dafb;
+.navbar ul li a {
+  color: white;         /* Link color */
+  text-decoration: none; /* No underline */
+  padding: 0.5rem 1rem; /* Padding for better click area */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.navbar ul li a:hover {
+  text-decoration: underline; /* Underline on hover */
 }
