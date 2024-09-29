@@ -1,0 +1,4 @@
+staff_id,starting_date,end_date,monday,tuesday,wednesday,thursday,friday,saturday,sunday
+140108,2024-09-30,2024-10-04,AM,PM,full_day,in_office,AM,,
+140108,2024-10-07,2024-10-11,in_office,full_day,PM,AM,PM,,
+140108,2024-10-14,2024-10-18,full_day,AM,PM,full_day,in_office,,
