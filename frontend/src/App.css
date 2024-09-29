@@ -1,38 +1,37 @@
-/* Make sure the body and html have a full height */
 body, html {
   height: 100%;
   margin: 0;
 }
 
-/* Style for the NavBar */
+
 .navbar {
-  position: fixed;      /* Keep the navbar fixed */
-  bottom: 0;           /* Align it to the bottom */
-  left: 0;             /* Align to the left */
-  width: 100%;         /* Full width */
-  background-color: #4CAF50; /* Background color */
-  padding: 1rem;       /* Padding around the links */
-  z-index: 1000;       /* Ensure it stays on top */
+  position: fixed;     
+  bottom: 0;          
+  left: 0;            
+  width: 100%;         
+  background-color: #4CAF50;
+  padding: 1rem;       
+  z-index: 1000;       
 }
 
 .navbar ul {
-  list-style-type: none; /* No bullet points */
-  display: flex;         /* Flex display for horizontal alignment */
-  justify-content: center; /* Center the items */
-  margin: 0;            /* Remove default margin */
-  padding: 0;           /* Remove default padding */
+  list-style-type: none; 
+  display: flex;         
+  justify-content: center; 
+  margin: 0;          
+  padding: 0;          
 }
 
 .navbar ul li {
-  display: inline;       /* Inline display for list items */
+  display: inline;      
 }
 
 .navbar ul li a {
-  color: white;         /* Link color */
-  text-decoration: none; /* No underline */
-  padding: 0.5rem 1rem; /* Padding for better click area */
+  color: white;         
+  text-decoration: none;
+  padding: 0.5rem 1rem; 
 }
 
 .navbar ul li a:hover {
-  text-decoration: underline; /* Underline on hover */
+  text-decoration: underline;
 }
