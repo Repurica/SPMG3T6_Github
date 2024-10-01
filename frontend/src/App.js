@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import ApplicationForm from './ApplicationForm';
-import SchedulerTest from './SchedulerTest';
+import StaffScheduler from './StaffScheduler';
 import NavBar from './NavBar';
 import './App.css'
 const App = () => {
@@ -9,7 +9,7 @@ const App = () => {
     <div className="content">
       <NavBar />
       <Routes>
-        <Route path="/" element={<SchedulerTest />} />
+        <Route path="/" element={<StaffScheduler />} />
         <Route path="/applicationForm" element={<ApplicationForm />} />
       </Routes>
     </div>

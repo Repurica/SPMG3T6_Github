@@ -2,9 +2,7 @@
 
 ##npm install (to install all dependencies)
 
-npm install @bitnoi.se/react-scheduler
-
-npm install dayjs
+npm i devextreme-react
 
 npm install react-datepicker
 
