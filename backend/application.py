@@ -77,7 +77,7 @@ def store_application():
          json_sent["application_id"] = count_records.count + 1
          json_sent["status"] = "pending"
          response = supabase.table("application").insert(json_sent).execute()
-         if response:
+         if response and response.data:
            return {"count" : count_records.count,"status": "success"},200
          else:
            return {"status" : "error", "message" : "could not insert into database"},404

@@ -93,6 +93,8 @@ def test_store_application_insert_failure(mock_supabase, client):
     assert json_data["status"] == "error"
     assert json_data["message"] == "could not insert into database"
 
+
+
 @patch("application.supabase")
 def test_store_application_exception(mock_supabase, client):
     # Mock an exception during the process
