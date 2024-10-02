@@ -28,10 +28,9 @@ def get_dates_on_same_weekday(start_date_str, end_date_str):
 @app.route('/application/available_dates',methods=['GET'])
 #function that returns all dates at which requests have already been made
 def return_available_dates():
-    # json_sent = request.get_json()
+    json_sent = request.get_json()
     # staff id comes in from front-end, so staff_id is hardcoded for now
-    staff_id = 140002
-    staff_id_2 = 140003
+    staff_id = json_sent["staff_id"]
     # extract from supabase the dates where the staff is WFH
     results = []
     #looping through 
