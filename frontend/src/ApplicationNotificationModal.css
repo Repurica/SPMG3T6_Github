@@ -1,0 +1,52 @@
+.modal {
+  max-width: 900px; /* Larger max width */
+  margin: 0 auto; /* Center the modal */
+  padding: 40px; /* More padding for additional space */
+  background-color: #f9f9f9; /* Same background as the form */
+  border: 1px solid #ccc; /* Match the form's border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  text-align: left; /* Align text to the left */
+}
+  
+  .modal h2 {
+    text-align: center; /* Center the heading */
+    font-size: 24px; /* Match the form's heading size */
+    color: #333; /* Dark color for the heading */
+    margin-bottom: 20px; /* Space below the heading */
+  }
+  
+  .modal p {
+    font-size: 16px; /* Standard font size for the notification message */
+    margin-bottom: 20px; /* Space below the message */
+  }
+  
+  /* Button styling for the modal */
+  .modal button {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #4CAF50; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 18px; /* Font size for button text */
+  }
+  
+  .modal button:hover {
+    background-color: #45a049; /* Darker shade on hover */
+  }
+  
+  /* Overlay styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center the modal overlay */
+  }
