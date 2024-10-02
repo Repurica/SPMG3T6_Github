@@ -65,3 +65,107 @@ def get_schedule_by_date():
         return {"status": "error", "message": str(e)}, 500
 
 # http://127.0.0.1:5000/schedule/schedule_by_date?staff_id=140003&date=2024-10-04 - Can use this to test postman
+
+
+
+# Endpoint to get team schedule based on position (team members)
+@schedule.route('/team_schedule')
+def team_schedule():
+    # Get the staff_id and date from query parameters
+    staff_id = request.args.get('staff_id')  # Staff member making the request
+    date_str = request.args.get('date')  # Date to check
+
+    # Convert date string to a proper date object
+    try:
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return {"error": "Invalid date format. Use YYYY-MM-DD."}, 400
+
+    # Query to get the position of the staff making the request
+    staff_position_data = supabase.table('employee') \
+        .select('position') \
+        .eq('staff_id', staff_id) \
+        .single() \
+        .execute()
+
+    if not staff_position_data.data:
+        return {"error": "Staff not found."}, 404
+
+    # Extract the position of the querying staff member
+    position = staff_position_data.data['position']
+
+    # Query to get all team members with the same position and role=2 (staff)
+    team_members = supabase.table('employee') \
+        .select('staff_id', 'staff_fname', 'staff_lname') \
+        .eq('position', position) \
+        .eq('role', 2) \
+        .execute()
+
+    if not team_members.data:
+        return {"error": "No team members found."}, 404
+
+    # For each team member, get their schedule for the given date
+    results = []
+    for member in team_members.data:
+        member_id = member['staff_id']
+
+        # Query for the team member's schedule based on staff_id and date
+        schedule_data = supabase.table('schedule') \
+            .select("*") \
+            .eq('staff_id', member_id) \
+            .lte('starting_date', date) \
+            .gte('end_date', date) \
+            .execute()
+
+        if schedule_data.data:
+            # Extract the schedule for the specific day
+            day_of_week = date.strftime('%A').lower()  # e.g., 'monday', 'tuesday'
+            member_schedule = schedule_data.data[0].get(day_of_week, "No schedule")
+
+            # Add the member's schedule to the result list
+            results.append({
+                "staff_id": member_id,
+                "name": f"{member['staff_fname']} {member['staff_lname']}",
+                "schedule": member_schedule
+            })
+        else:
+            # If no schedule is found for the member on that date
+            results.append({
+                "staff_id": member_id,
+                "name": f"{member['staff_fname']} {member['staff_lname']}",
+                "schedule": "No schedule"
+            })
+
+    # Return the results as JSON
+    return {"team_schedule": results}
+
+
+# Endpoint to get a specific staff's schedule
+@schedule.route('/one_schedule')
+def one_schedule():
+    # Get the 'staff_id' and 'date' from the query parameters
+    staff_id = request.args.get('staff_id')
+    date_str = request.args.get('date')
+
+    # Convert date string to a date object
+    try:
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return {"error": "Invalid date format. Use YYYY-MM-DD."}, 400
+
+    # Query the database for the schedule
+    data = supabase.table('schedule') \
+        .select("*") \
+        .eq('staff_id', staff_id) \
+        .lte('starting_date', date) \
+        .gte('end_date', date) \
+        .execute()
+
+    if not data.data:
+        return {"error": "No schedule found for this staff and date."}, 404
+
+    # Determine the day of the week (e.g., "monday", "tuesday") and find the schedule
+    day_of_week = date.strftime('%A').lower()
+    schedule = data.data[0].get(day_of_week, "No schedule")
+
+    return {"staff_id": staff_id, "date": date_str, "schedule": schedule}
