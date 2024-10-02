@@ -72,8 +72,8 @@ def get_schedule_by_date():
 @schedule.route('/team_schedule')
 def team_schedule():
     # Get the staff_id and date from query parameters
-    staff_id = request.args.get('staff_id')  # Staff member making the request
-    date_str = request.args.get('date')  # Date to check
+    staff_id = request.args.get('staff_id')
+    date_str = request.args.get('date')  
 
     # Convert date string to a proper date object
     try:
@@ -136,24 +136,21 @@ def team_schedule():
                 "schedule": "No schedule"
             })
 
-    # Return the results as JSON
+ 
     return {"team_schedule": results}
 
 
 # Endpoint to get a specific staff's schedule
 @schedule.route('/one_schedule')
 def one_schedule():
-    # Get the 'staff_id' and 'date' from the query parameters
     staff_id = request.args.get('staff_id')
     date_str = request.args.get('date')
 
-    # Convert date string to a date object
     try:
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
     except ValueError:
         return {"error": "Invalid date format. Use YYYY-MM-DD."}, 400
 
-    # Query the database for the schedule
     data = supabase.table('schedule') \
         .select("*") \
         .eq('staff_id', staff_id) \
@@ -164,7 +161,6 @@ def one_schedule():
     if not data.data:
         return {"error": "No schedule found for this staff and date."}, 404
 
-    # Determine the day of the week (e.g., "monday", "tuesday") and find the schedule
     day_of_week = date.strftime('%A').lower()
     schedule = data.data[0].get(day_of_week, "No schedule")
 
