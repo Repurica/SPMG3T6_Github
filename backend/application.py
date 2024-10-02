@@ -25,7 +25,7 @@ def get_dates_on_same_weekday(start_date_str, end_date_str):
 
 
 
-@app.route('/application/available_dates',methods=['GET'])
+@app.route('/application/available_dates',methods=['POST'])
 #function that returns all dates at which requests have already been made
 def return_available_dates():
     json_sent = request.get_json()
@@ -60,17 +60,10 @@ def return_available_dates():
                "info" : repr(e)}, 500
 
 
-@app.route('/application/store_application',methods=['GET'])
+@app.route('/application/store_application',methods=['POST'])
 def store_application():
-    # json_sent = request.get_json()
-    json_sent = { 
-   "request_type" : "recurring",
-   "starting_date" : "2024-09-30",
-   "end_date" : "2024-10-7",
-   "reason" : "test reason 2",
-   "timing" : "AM",
-   "staff_id" : 140002
-}   
+    json_sent = request.get_json()
+
     try:
          count_records = supabase.from_("application").select("*", count="exact").execute()
          json_sent["application_id"] = count_records.count + 1
