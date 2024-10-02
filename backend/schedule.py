@@ -140,30 +140,4 @@ def team_schedule():
     return {"team_schedule": results}
 
 
-# Endpoint to get a specific staff's schedule
-@schedule.route('/one_schedule')
-def one_schedule():
-    staff_id = request.args.get('staff_id')
-    date_str = request.args.get('date')
-
-    try:
-        date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        return {"error": "Invalid date format. Use YYYY-MM-DD."}, 400
-
-    data = supabase.table('schedule') \
-        .select("*") \
-        .eq('staff_id', staff_id) \
-        .lte('starting_date', date) \
-        .gte('end_date', date) \
-        .execute()
-
-    if not data.data:
-        return {"error": "No schedule found for this staff and date."}, 404
-
-    day_of_week = date.strftime('%A').lower()
-    schedule = data.data[0].get(day_of_week, "No schedule")
-
-    return {"staff_id": staff_id, "date": date_str, "schedule": schedule}
-
     # can test in postman using http://127.0.0.1:5000/schedule/team_schedule?staff_id=140003&date=2024-10-01
