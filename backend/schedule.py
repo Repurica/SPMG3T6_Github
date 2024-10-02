@@ -169,3 +169,5 @@ def one_schedule():
     schedule = data.data[0].get(day_of_week, "No schedule")
 
     return {"staff_id": staff_id, "date": date_str, "schedule": schedule}
+
+    # can test in postman using http://127.0.0.1:5000/schedule/team_schedule?staff_id=140003&date=2024-10-01
