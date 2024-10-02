@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
+import ApplicationNotificationModal from './ApplicationNotificationModal';
 import 'react-datepicker/dist/react-datepicker.css'; // Import CSS for DatePicker
 import './ApplicationForm.css'
 // Get date ranges of 2 months before and 3 months after
@@ -17,8 +18,10 @@ const getDateRanges = () => {
 };
 //TO DO: FETCH DATA FROM BACKEND AND SEND DATA TO BACKEND
 function ApplicationForm() {
+  const [error, setError] = useState(null)
+  const [data, setData] = useState([]);
   const { formattedTwoMonthsBefore, formattedThreeMonthsAfter } = getDateRanges();
-  const [selection, setSelection] = useState('ad-hoc');
+  const [selection, setSelection] = useState('ad_hoc');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [timing, setTiming] = useState('')
@@ -26,52 +29,47 @@ function ApplicationForm() {
   const [checkAM, setCheckAM] = useState("");
   const [checkPM, setCheckPM] = useState("");
   const [checkFullDay, setCheckFullDay] = useState("");
+  const [notification, setNotification] = useState('');
+
+  //temp staff id for now
+  const staffId = 140002
 
 
-  const json = [{"date":"2024-09-30","wfh_timing":"AM"}, {"date":"2024-10-07","wfh_timing":"AM"}, {"date":"2024-10-11","wfh_timing":"PM"}, {"date":"2024-10-09","wfh_timing":"Full Day"}]
-  const blockedFull = []
-  const blockedAM = []
-  const blockedPM = []
-  for (let i = 0; i < json.length; i++){
-    if (json[i]["wfh_timing"] === "AM"){
-      blockedAM.push(new Date(json[i]["date"] + "T00:00:00+08:00")) //SGT
-    }
+  // fetch data from application.py
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/application/available_dates', {
+          method: 'POST', 
+          headers: {
+            'Content-Type': 'application/json', // Send JSON data
+          },
+          body: JSON.stringify({ staff_id: staffId }), // Data to be sent on page load
+        });
 
-    else if (json[i]["wfh_timing"] === "PM"){
-      blockedPM.push(new Date(json[i]["date"] + "T00:00:00+08:00"))
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
 
-    }
-
-    else {
-      blockedFull.push(new Date(json[i]["date"] + "T00:00:00+08:00"))
-    }
-  }
-
-    // find recurring days
-    const findRecurringDays = (start, end) => {
-      let result = [];
-      let currentDate = new Date(start);
-      const endDateObj = new Date(end);
-      const startDayOfWeek = currentDate.getDay(); // Day of the week of the start date
-  
-      // Loop through the date range
-      while (currentDate <= endDateObj) {
-        if (currentDate.getDay() === startDayOfWeek) {
-          result.push(new Date(currentDate)); // Store a copy of the date
         }
-  
-        // Move to the next day
-        currentDate.setDate(currentDate.getDate() + 1);
+
+        const result = await response.json();
+        setData(result['results']);
+        setError(null)
+      } catch (err) {
+        console.log(err.message);
+         // display error message for now
+         setError(err.message)
       }
-      return result;
-    }
+
+    };
+
+    fetchData();
+  }, []);
+
     //when both start and end date present
     useEffect(() => {
       if (startDate && endDate) {  // Ensure both dates are set
         let recurringDays = findRecurringDays(startDate, endDate);
-        console.log(startDate)
-        console.log(endDate)
-        console.log(recurringDays)
         let amCounter = 0;
         let pmCounter = 0;
         let fullDayCounter = 0;
@@ -87,9 +85,7 @@ function ApplicationForm() {
             fullDayCounter++;
           }
         }
-        console.log(amCounter)
-        console.log(pmCounter)
-        console.log(fullDayCounter)
+
         if ((amCounter > 0 && pmCounter > 0) || fullDayCounter > 0) {
           alert('Selected date ranges have conflicting dates that are already applied for')
           setEndDate(null)
@@ -114,11 +110,10 @@ function ApplicationForm() {
       }
     }, [startDate,endDate]);
 
-
-
+  // only start date present   
   useEffect(() => {
     if (startDate) {
-      if (selection === 'ad-hoc') {
+      if (selection === 'ad_hoc') {
         if (blockedAM.some(d => d.getTime() === startDate.getTime())){
           setCheckAM("Yes")
           setCheckPM("")
@@ -140,6 +135,48 @@ function ApplicationForm() {
     }
 
   }, [startDate])
+
+
+
+  const blockedFull = []
+  const blockedAM = []
+  const blockedPM = []
+
+  //filter wfh timings into respective arrays
+  for (let i = 0; i < data.length; i++){
+    if (data[i]["wfh_timing"] === "AM"){
+      blockedAM.push(new Date(data[i]["date"] + "T00:00:00+08:00")) //SGT
+    }
+
+    else if (data[i]["wfh_timing"] === "PM"){
+      blockedPM.push(new Date(data[i]["date"] + "T00:00:00+08:00"))
+
+    }
+
+    else {
+      blockedFull.push(new Date(data[i]["date"] + "T00:00:00+08:00"))
+    }
+  }
+
+    // find recurring days
+    const findRecurringDays = (start, end) => {
+      let result = [];
+      let currentDate = new Date(start);
+      const endDateObj = new Date(end);
+      const startDayOfWeek = currentDate.getDay(); // Day of the week of the start date
+  
+      // Loop through the date range
+      while (currentDate <= endDateObj) {
+        if (currentDate.getDay() === startDayOfWeek) {
+          result.push(new Date(currentDate)); // Store a copy of the date
+        }
+  
+        // Move to the next day
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return result;
+    }
+
 
   // block out weekends (Saturday and Sunday) and dates that the user has applications pending/accepted
   const isWeekday = (date) => {
@@ -171,24 +208,67 @@ function ApplicationForm() {
   };
 
   
-
-  
   //check for empty values
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (timing === ''){
       alert('Please select a timing')
     }
     else {
+      let toSend = {}
+      if (endDate){
+        toSend = { 
+          "request_type" : selection,
+          "starting_date" : startDate.toLocaleDateString("en-CA"), // yyyy-mm-dd format
+          "end_date" : endDate.toLocaleDateString("en-CA"),
+          "reason" : reason,
+          "timing" : timing,
+          "staff_id" : staffId
+       }          
+      }
+      else {
+        toSend = { 
+          "request_type" : selection,
+          "starting_date" : startDate.toLocaleDateString("en-CA"),
+          "end_date" : endDate,
+          "reason" : reason,
+          "timing" : timing,
+          "staff_id" : staffId
+       }  
+      }
       //submit
-      console.log(startDate)
-      console.log(endDate)
-      console.log(selection)
-      console.log(timing)
-      console.log(reason)
+ 
+      try {
+        const response = await fetch('http://localhost:5000/application/store_application', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(toSend),
+        });
+
+        if (response.ok) {
+            const jsonResponse = await response.json();
+            console.log('Success:', jsonResponse);
+            setNotification(`Form submitted successfully!`);
+        } else {
+            console.error('Error:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
     }
   };
 
+  // notification modal
+  const handleClose = () => {
+    window.location.reload(); // Refresh Page
+  };
+  if (error){
+    return (<h1>Error occured fetching data. Refresh the page</h1>)
+  }
+  else {
+ 
   return (
     //form for application
     <div>
@@ -207,11 +287,11 @@ function ApplicationForm() {
           <label>
             <input
               type="radio"
-              value="ad-hoc"
-              checked={selection === 'ad-hoc'}
+              value="ad_hoc"
+              checked={selection === 'ad_hoc'}
               onChange={handleSelectionChange}
             />
-            Ad-hoc
+            Ad hoc
           </label>
         </div>
         <div>
@@ -264,8 +344,8 @@ function ApplicationForm() {
         <label>
             <input
               type="radio"
-              value="Full Day"
-              checked={timing === 'Full Day'}
+              value="full_day"
+              checked={timing === 'full_day'}
               onChange={handleTimingChange}
             />
             Full Day
@@ -310,8 +390,11 @@ function ApplicationForm() {
 
         <button type="submit">Submit</button>
       </form>
+      <ApplicationNotificationModal message={notification} onClose={handleClose} /> 
+
     </div>
   );
+}
 }
 
 export default ApplicationForm;
