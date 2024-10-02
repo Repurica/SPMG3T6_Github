@@ -272,7 +272,7 @@ function ApplicationForm() {
   return (
     //form for application
     <div>
-      <h1>Schedule Form</h1>
+      <h1>WFH Application Form</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label>
