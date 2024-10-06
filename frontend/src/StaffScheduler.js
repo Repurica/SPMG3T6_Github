@@ -1,48 +1,66 @@
 import 'devextreme/dist/css/dx.light.css';
-import { schedules, staffData, onsiteData } from './schedules.js';
- 
-import { Scheduler, View, Resource } from 'devextreme-react/scheduler';
- 
+import { schedules, staff_data } from './schedules.js';
+import { useState, useEffect } from 'react';
+import { Scheduler, View, Resource, Editing } from 'devextreme-react/scheduler';
+
 function StaffScheduler() {
-    const groups = ['ownerId'];
+    const groups = ['staff_id'];
+
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+
+    useEffect(() => {
+      const currentDate = new Date();
+      currentDate.setMonth(currentDate.getMonth() - 2); 
+      setStartDate(currentDate.toDateString()); 
+    }, []);
+
+    useEffect(() => {
+        const currentDate = new Date();
+        currentDate.setMonth(currentDate.getMonth() + 3); 
+        setEndDate(currentDate.toDateString()); 
+      }, []);
 
     return (
-        <Scheduler id="scheduler"
-            dataSource={schedules}
-            textExpr="text"
-            allDayExpr="dayLong"
-            recurrenceRuleExpr="recurrence"
-            defaultCurrentView="timelineDay"
+        <Scheduler id='scheduler'
+            dataSource={schedules.filter(item => new Date(item.startDate).getDate() >= new Date(startDate).getDate() 
+                && new Date(item.startDate).getDate() <= new Date(endDate).getDate())}
             groups={groups}
-            height={700}
-            adaptivityEnabled={true}>
+            firstDayOfWeek={1}
+            startDayHour={8}
+            endDayHour={17}
+            textExpr="wfh"
+            defaultCurrentView="timelineDay"
+            min={startDate}
+            max={endDate}>
+            
+            <Editing
+                allowAdding={false}
+                allowDeleting={false}
+                allowDragging={false}
+                allowResizing={false}
+                allowTimeZoneEditing={false}
+                allowUpdating={false}
+            />
 
             <View
                 type="timelineDay"
                 name='Day'
-                startDayHour={10}
-                endDayHour={22}
+                cellDuration={60}
             />
 
             <View
                 type="timelineWeek"
                 name='Week'
-                startDayHour={10}
-                endDayHour={22}
+                cellDuration={270}
             />
 
             <Resource
-                fieldExpr="onsite"
-                allowMultiple={false}
-                dataSource={onsiteData}
-                label="Onsite"
-            />
-
-            <Resource
-                fieldExpr="ownerId"
-                allowMultiple={true}
-                dataSource={staffData}
-                label="Owner"
+                fieldExpr='staff_id'
+                dataSource={staff_data}
+                label="Staff"
+                valueExpr='staff_id'
+                displayExpr='staff_name'
                 useColorAsDefault={true}
             />
         </Scheduler>
