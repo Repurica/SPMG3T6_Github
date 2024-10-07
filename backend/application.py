@@ -78,8 +78,8 @@ def store_application():
 
 
 
-@app.route('/application/retrieve_requests')
-def retrieve_requests():
+@app.route('/application/retrieve_pending_requests')
+def retrieve_pending_requests():
    test_manager_id = 140894
 
    try:
