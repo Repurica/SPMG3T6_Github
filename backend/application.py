@@ -77,6 +77,57 @@ def store_application():
         return {"info" : repr(e)}, 500
 
 
+
+@app.route('/application/retrieve_requests')
+def retrieve_requests():
+   test_manager_id = 140894
+
+   try:
+     response_employee = supabase.table("employee").select("staff_id","staff_fname","staff_lname").eq("reporting_manager",test_manager_id).execute()
+     list_of_staff_ids = []
+     dict_staff_ids_names = {}
+    
+     for staff_id_dict in response_employee.data:
+        list_of_staff_ids.append(staff_id_dict["staff_id"])
+     for staff_id_dict in response_employee.data:
+        dict_staff_ids_names[staff_id_dict["staff_id"]] = staff_id_dict["staff_fname"] + " " + staff_id_dict["staff_lname"]
+        
+     response_application = supabase.table("application").select("application_id","staff_id","created_at","starting_date","end_date","timing","request_type").in_("staff_id",list_of_staff_ids).eq("status","pending").execute()
+     returned_result = response_application.data
+    #  print(dict_staff_ids_names)
+     for record in returned_result:
+        record_staff_id = record["staff_id"]
+        record["staff_fullname"] = dict_staff_ids_names[record_staff_id]
+
+        
+     return returned_result
+
+
+   except Exception as e:
+        return {"info" : repr(e)}, 500
+
+
+
+@app.route("/application/specific_request")
+def request_details():
+   test_request_id = 1
+   try:
+     
+
+     
+     response_application = supabase.table("application").select("reason","staff_id","created_at","starting_date","end_date","timing","request_type").eq("application_id",test_request_id).execute()
+     application_data = response_application.data
+     staff_id = response_application.data[0]["staff_id"]
+     employee_response = supabase.table("employee").select("staff_fname","staff_lname").eq("staff_id",staff_id).execute()
+     employee_data = employee_response.data
+     returned_data = response_application.data
+     returned_data[0]["employee_fullname"] = employee_data[0]["staff_fname"] + " " + employee_data[0]["staff_lname"]
+
+     return returned_data
+   except Exception as e:
+      return {"info" : repr(e)}, 500
+      
+
    
 
 
