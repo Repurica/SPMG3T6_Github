@@ -92,15 +92,20 @@ def retrieve_pending_requests():
      for staff_id_dict in response_employee.data:
         dict_staff_ids_names[staff_id_dict["staff_id"]] = staff_id_dict["staff_fname"] + " " + staff_id_dict["staff_lname"]
         
-     response_application = supabase.table("application").select("application_id","staff_id","created_at","starting_date","end_date","timing","request_type").in_("staff_id",list_of_staff_ids).eq("status","pending").execute()
+     response_application = supabase.table("application").select("application_id","staff_id","created_at","starting_date","end_date","timing","request_type","reason").in_("staff_id",list_of_staff_ids).eq("status","pending").execute()
      returned_result = response_application.data
     #  print(dict_staff_ids_names)
      for record in returned_result:
         record_staff_id = record["staff_id"]
         record["staff_fullname"] = dict_staff_ids_names[record_staff_id]
 
-        
-     return returned_result
+     sorted_data = sorted(returned_result, key=lambda x: datetime.fromisoformat(x["created_at"]))
+     for item in sorted_data:
+      created_at_datetime = datetime.fromisoformat(item["created_at"])
+      item["created_at"] = created_at_datetime.strftime("%Y-%m-%d")
+
+     result_dict = {item["application_id"]: {key: value for key, value in item.items() if key != "application_id"} for item in sorted_data}
+     return result_dict
 
 
    except Exception as e:
