@@ -153,13 +153,32 @@ def store_approval_rejection():
    except Exception as e:
       return {"info" : repr(e)}, 500
    
-@app.route("/application/current_manpower")
+@app.route("/application/current_manpower_team")
 def get_current_manpower():
    today = date.today()
-   current_day_of_week = datetime.now().strftime('%A')
-   schedule_response = supabase.table("schedule").select('*',count = "exact").filter('starting_date', 'lte', today).filter('end_date', 'gte', today).eq(current_day_of_week,"in-office").execute()
+   print(today)
+   current_day_of_week = datetime.now().strftime('%A').lower()
+   current_day_of_week = current_day_of_week.lower()
+   print(current_day_of_week)
+   test_manager_id = 140894
+   try:
+     
+     response_employee = supabase.table("employee").select("staff_id","staff_fname","staff_lname").eq("reporting_manager",test_manager_id).execute()
+     list_of_staff_ids = []
+    
+     for staff_id_dict in response_employee.data:
+        list_of_staff_ids.append(staff_id_dict["staff_id"])
+     print(list_of_staff_ids)
+     schedule_response = supabase.table("schedule").select('*').lte('starting_date', today).gte("end_date", today).eq(current_day_of_week,"in_office").in_("staff_id",list_of_staff_ids).execute()
+     count_in_office = len(schedule_response.data)
+     max_capacity_response = supabase.table("schedule").select('*').lte('starting_date', today).gte("end_date", today).in_("staff_id",list_of_staff_ids).execute()
+     max_capacity = len(max_capacity_response.data)
+     percentage_capacity = count_in_office/max_capacity*100
+     formatted_capacity = round(percentage_capacity, 2)  
+     return {"percentage_capacity": formatted_capacity},200
    
-   return schedule_response.data
+   except Exception as e:
+      return {"info" : repr(e)}, 500
 
       
   
