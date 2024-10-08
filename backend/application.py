@@ -2,7 +2,7 @@ from flask import Flask,request
 from supabase_init import supabase
 from flask_cors import CORS
 app = Flask(__name__)
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,date
 CORS(app)
 #helper function to get_dates_between_2_dates
 def get_dates_on_same_weekday(start_date_str, end_date_str):
@@ -105,7 +105,7 @@ def retrieve_pending_requests():
       item["created_at"] = created_at_datetime.strftime("%Y-%m-%d")
 
      result_dict = {item["application_id"]: {key: value for key, value in item.items() if key != "application_id"} for item in sorted_data}
-     return result_dict
+     return result_dict,200
 
 
    except Exception as e:
@@ -128,9 +128,41 @@ def request_details():
      returned_data = response_application.data
      returned_data[0]["employee_fullname"] = employee_data[0]["staff_fname"] + " " + employee_data[0]["staff_lname"]
 
-     return returned_data
+     return returned_data,200
    except Exception as e:
       return {"info" : repr(e)}, 500
+   
+  
+@app.route("/application/store_approval_rejection")
+def store_approval_rejection():
+   sent_info = {
+      "id" : 1,
+      "outcome":"approved"
+   }
+   try:
+    sent_id = sent_info["id"]
+    sent_outcome = sent_info["outcome"]
+    if sent_outcome == "approved":
+       application_response = supabase.table("application").update({"status": "approved"}).eq("application_id", sent_id).execute()
+       return {"update database":"success"},200
+    elif sent_outcome == "rejected":
+       application_response = supabase.table("application").update({"status": "rejected"}).eq("application_id", sent_id).execute()
+       return {"update database":"success"},200
+    else:
+       return {"update database":"succeeded but outcome is neither rejected or approved"},404
+   except Exception as e:
+      return {"info" : repr(e)}, 500
+   
+@app.route("/application/current_manpower")
+def get_current_manpower():
+   today = date.today()
+   current_day_of_week = datetime.now().strftime('%A')
+   schedule_response = supabase.table("schedule").select('*',count = "exact").filter('starting_date', 'lte', today).filter('end_date', 'gte', today).eq(current_day_of_week,"in-office").execute()
+   
+   return schedule_response.data
+
+      
+  
       
 
    
