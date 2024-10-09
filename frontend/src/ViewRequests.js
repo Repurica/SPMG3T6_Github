@@ -1,66 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ViewRequests.css'; // Import the CSS file
 import { FaInbox } from 'react-icons/fa'; // Import the inbox icon
 
-const itemsPerPage = 3;
 
-const data = {
-    "1": {
-        "created_at": "2024-10-06",
-        "end_date": "2024-10-10",
-        "reason": "family matters",
-        "request_type": "recurring",
-        "staff_fullname": "Susan Goh",
-        "staff_id": 140002,
-        "starting_date": "2024-09-26",
-        "timing": "AM",
-        "reason": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-    },
-    "2": {
-        "created_at": "2024-10-06",
-        "end_date": "2024-10-10",
-        "reason": "family matters",
-        "request_type": "recurring",
-        "staff_fullname": "Susan Goh",
-        "staff_id": 140002,
-        "starting_date": "2024-09-26",
-        "timing": "AM",
-        "reason": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-    },
-    "3": {
-        "created_at": "2024-10-06",
-        "end_date": "2024-10-10",
-        "reason": "family matters",
-        "request_type": "recurring",
-        "staff_fullname": "Susan Goh",
-        "staff_id": 140002,
-        "starting_date": "2024-09-26",
-        "timing": "AM",
-        "reason": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-    },
-    "4": {
-        "created_at": "2024-10-06",
-        "end_date": "2024-10-10",
-        "reason": "family matters",
-        "request_type": "recurring",
-        "staff_fullname": "Susan Goh",
-        "staff_id": 140002,
-        "starting_date": "2024-09-26",
-        "timing": "AM",
-        "reason": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-    },
-    "5": {
-        "created_at": "2024-10-06",
-        "end_date": "2024-10-10",
-        "reason": "family matters",
-        "request_type": "ad hoc",
-        "staff_fullname": "test",
-        "staff_id": 123,
-        "starting_date": "2024-09-26",
-        "timing": "AM",
-        "reason": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-    }
-    // Add more entries here
+const handleCardClick = (key) => {
+    console.log(`Card with key ${key} clicked`);
+    // Add logic for card click, such as opening a detailed view or modal
+};
+
+const handleCardHover = (key, isHovering) => {
+
 };
 
 const handleApprove = () => {
@@ -72,6 +21,14 @@ const handleReject = () => {
 };
 
 function ViewRequests() {
+    const [data, setData] = useState([]);
+    const [error, setError] = useState(null)
+
+    const test_manager_id = 140894
+
+    const itemsPerPage = 3;
+
+
     const [currentPage, setCurrentPage] = useState(1);
     const totalItems = Object.keys(data).length; // Total number of requests
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -84,6 +41,44 @@ function ViewRequests() {
 
     const currentItems = getCurrentItems();
 
+    // fetch data from application.py
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/application/retrieve_pending_requests', {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json', // Send JSON data
+            },
+            body: JSON.stringify({ manager_id: test_manager_id }), // Data to be sent on page load
+            });
+
+            if (!response.ok) {
+            throw new Error('Failed to fetch data');
+
+            }
+
+            const result = await response.json();
+            setData(result);
+            setError(null)
+        } catch (err) {
+            console.log(err.message);
+            // display error message for now
+            setError(err.message)
+        }
+
+        };
+
+        fetchData();
+    }, []);
+    console.log(data)
+
+
+    if (error){
+        return (<h1>Error occured fetching data.</h1>)
+      }
+      else {
+    
     return (
         <div className="container">
             <div className="header">
@@ -95,7 +90,10 @@ function ViewRequests() {
             </div>
             <div>
                 {currentItems.map(([key, item]) => (
-                    <div key={key} className="request-card">
+                    <div key={key} className="request-card"
+                    onClick={() => handleCardClick(key)}
+                    onMouseEnter={() => handleCardHover(key, true)} 
+                    onMouseLeave={() => handleCardHover(key, false)}>
                         <div className="button-container">
                             <button onClick={() => handleApprove(key)} className="action-button approve">Approve</button>
                             <button onClick={() => handleReject(key)} className="action-button reject">Reject</button>
@@ -103,7 +101,7 @@ function ViewRequests() {
                         <p><strong>Application Date:</strong> {item.created_at}</p>
                         <p><strong>Name:</strong> {item.staff_fullname}</p>
                         <p><strong>Position ID:</strong> {item.staff_id}</p>
-                        {item.request_type === 'ad hoc' ? (
+                        {item.request_type === 'ad_hoc' ? (
                             <p><strong>Start Date:</strong> {item.starting_date}</p>
                         ) : (
                             <p>
@@ -111,7 +109,12 @@ function ViewRequests() {
                                 <strong>End Date:</strong> {item.end_date}
                             </p>
                         )}
-                        <p><strong>Timing:</strong> {item.timing}</p>
+                        {item.timing === "full_day" ? (
+                            <p><strong>Timing:</strong> Full Day</p>
+                        ) : (
+                            <p><strong>Timing:</strong> {item.timing}</p>
+
+                        )}
                         <p><strong>Reason:</strong> {item.reason}</p>
                     </div>
                 ))}
@@ -127,6 +130,6 @@ function ViewRequests() {
             </div>
         </div>
     );
-}
+}}
 
 export default ViewRequests;

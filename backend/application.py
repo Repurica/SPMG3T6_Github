@@ -78,12 +78,12 @@ def store_application():
 
 
 
-@app.route('/application/retrieve_pending_requests')
+@app.route('/application/retrieve_pending_requests',methods=['POST'])
 def retrieve_pending_requests():
-   test_manager_id = 140894
-
+   #test_manager_id = 140894
+   json_sent = request.get_json()
    try:
-     response_employee = supabase.table("employee").select("staff_id","staff_fname","staff_lname").eq("reporting_manager",test_manager_id).execute()
+     response_employee = supabase.table("employee").select("staff_id","staff_fname","staff_lname").eq("reporting_manager",json_sent["manager_id"]).execute()
      list_of_staff_ids = []
      dict_staff_ids_names = {}
     
@@ -104,7 +104,7 @@ def retrieve_pending_requests():
       created_at_datetime = datetime.fromisoformat(item["created_at"])
       item["created_at"] = created_at_datetime.strftime("%Y-%m-%d")
 
-     result_dict = {item["application_id"]: {key: value for key, value in item.items()} for item in sorted_data}
+     result_dict = {item["application_id"]: {key: value for key, value in item.items() if key != "application_id"} for item in sorted_data}
      return result_dict,200
 
 
@@ -122,7 +122,7 @@ def request_details():
      
      response_application = supabase.table("application").select("reason","staff_id","created_at","starting_date","end_date","timing","request_type").eq("application_id",test_request_id).execute()
      application_data = response_application.data
-     staff_id = application_data[0]["staff_id"]
+     staff_id = response_application.data[0]["staff_id"]
      employee_response = supabase.table("employee").select("staff_fname","staff_lname").eq("staff_id",staff_id).execute()
      employee_data = employee_response.data
      returned_data = response_application.data
@@ -170,15 +170,12 @@ def get_current_manpower():
         list_of_staff_ids.append(staff_id_dict["staff_id"])
      print(list_of_staff_ids)
      schedule_response = supabase.table("schedule").select('*').lte('starting_date', today).gte("end_date", today).eq(current_day_of_week,"in_office").in_("staff_id",list_of_staff_ids).execute()
-     count_in_office = len(schedule_response.data) - 1
+     count_in_office = len(schedule_response.data)
      max_capacity_response = supabase.table("schedule").select('*').lte('starting_date', today).gte("end_date", today).in_("staff_id",list_of_staff_ids).execute()
      max_capacity = len(max_capacity_response.data)
      percentage_capacity = count_in_office/max_capacity*100
      formatted_capacity = round(percentage_capacity, 2)  
-     if formatted_capacity<50:
-       return {"percentage_capacity": formatted_capacity, "status" : "invalid"},200
-     else:
-       return {"percentage_capacity": formatted_capacity , "status" : "valid"},200
+     return {"percentage_capacity": formatted_capacity},200
    
    except Exception as e:
       return {"info" : repr(e)}, 500

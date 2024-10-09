@@ -44,6 +44,16 @@ h1 {
     margin: 3px 0;
 }
 
+.request-card:hover {
+    background-color: #f9f9f9;
+    transform: scale(1.02);
+    cursor: pointer;
+}
+
+.request-card:active {
+    background-color: #f1f1f1;
+}
+
 strong {
     font-size: 1.1em; /* Slightly increase the font size */
     background-color: #e8f5e9; /* Light green background for contrast */
