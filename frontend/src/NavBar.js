@@ -7,6 +7,7 @@ const NavBar = () => {
       <ul>
         <li><Link to="/">Schedule</Link></li>
         <li><Link to="/ApplicationForm">Application Form</Link></li>
+        <li><Link to="/ViewRequests">ViewRequests - temp route for now</Link></li>
       </ul>
     </nav>
   );
