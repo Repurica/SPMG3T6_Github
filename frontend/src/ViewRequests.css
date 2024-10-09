@@ -1,0 +1,124 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.inbox-icon {
+    font-size: 24px;
+}
+
+.request-count {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.request-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 15px 0;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative; /* Position relative for absolute positioning of buttons */
+}
+
+.request-card p {
+    margin: 3px 0;
+}
+
+strong {
+    font-size: 1.1em; /* Slightly increase the font size */
+    background-color: #e8f5e9; /* Light green background for contrast */
+    padding: 2px 4px; /* Add some padding around the text */
+    border-radius: 3px; /* Rounded corners */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+
+button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.navigate:disabled {
+    background-color: #ccc; /* Light grey */
+    cursor: not-allowed;
+}
+
+.navigate:not(:disabled):hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.page-info {
+    margin: 0 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.container {
+    position: relative; /* Position relative for absolute positioning of buttons */
+}
+
+.button-container {
+    position: absolute; /* Position absolute to place it in the top right */
+    top: 10px;         /* Adjust top margin as needed */
+    right: 10px;       /* Adjust right margin as needed */
+}
+
+.action-button {
+    margin-left: 5px; /* Space between buttons */
+    padding: 8px 12px; /* Adjust padding for button size */
+    color: white;      /* White text color */
+    border: none;      /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;    /* Pointer cursor on hover */
+}
+
+/* Green background for the Approve button */
+.action-button.approve {
+    background-color: #4CAF50; /* Green background */
+}
+
+.action-button.reject {
+    background-color: #f44336; /* Red background */
+}
+
+.action-button:hover.approve {
+    opacity: 0.8; /* Slight transparency on hover */
+}
+
+.action-button:hover.reject {
+    opacity: 0.8; /* Slight transparency on hover */
+}

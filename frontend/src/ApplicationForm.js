@@ -265,7 +265,7 @@ function ApplicationForm() {
     window.location.reload(); // Refresh Page
   };
   if (error){
-    return (<h1>Error occured fetching data. Refresh the page</h1>)
+    return (<h1>Error occured fetching data.</h1>)
   }
   else {
  
