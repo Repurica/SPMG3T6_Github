@@ -104,7 +104,7 @@ def retrieve_pending_requests():
       created_at_datetime = datetime.fromisoformat(item["created_at"])
       item["created_at"] = created_at_datetime.strftime("%Y-%m-%d")
 
-     result_dict = {item["application_id"]: {key: value for key, value in item.items() if key != "application_id"} for item in sorted_data}
+     result_dict = {item["application_id"]: {key: value for key, value in item.items()} for item in sorted_data}
      return result_dict,200
 
 
@@ -170,7 +170,7 @@ def get_current_manpower():
         list_of_staff_ids.append(staff_id_dict["staff_id"])
      print(list_of_staff_ids)
      schedule_response = supabase.table("schedule").select('*').lte('starting_date', today).gte("end_date", today).eq(current_day_of_week,"in_office").in_("staff_id",list_of_staff_ids).execute()
-     count_in_office = len(schedule_response.data)
+     count_in_office = len(schedule_response.data) - 1
      max_capacity_response = supabase.table("schedule").select('*').lte('starting_date', today).gte("end_date", today).in_("staff_id",list_of_staff_ids).execute()
      max_capacity = len(max_capacity_response.data)
      percentage_capacity = count_in_office/max_capacity*100
