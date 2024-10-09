@@ -122,7 +122,7 @@ def request_details():
      
      response_application = supabase.table("application").select("reason","staff_id","created_at","starting_date","end_date","timing","request_type").eq("application_id",test_request_id).execute()
      application_data = response_application.data
-     staff_id = response_application.data[0]["staff_id"]
+     staff_id = application_data[0]["staff_id"]
      employee_response = supabase.table("employee").select("staff_fname","staff_lname").eq("staff_id",staff_id).execute()
      employee_data = employee_response.data
      returned_data = response_application.data
@@ -175,7 +175,10 @@ def get_current_manpower():
      max_capacity = len(max_capacity_response.data)
      percentage_capacity = count_in_office/max_capacity*100
      formatted_capacity = round(percentage_capacity, 2)  
-     return {"percentage_capacity": formatted_capacity},200
+     if formatted_capacity<50:
+       return {"percentage_capacity": formatted_capacity, "status" : "invalid"},200
+     else:
+       return {"percentage_capacity": formatted_capacity , "status" : "valid"},200
    
    except Exception as e:
       return {"info" : repr(e)}, 500
