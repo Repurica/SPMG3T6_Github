@@ -23,6 +23,26 @@ def get_dates_on_same_weekday(start_date_str, end_date_str):
 
     return same_day_dates
 
+def get_matching_weekday_dates(start_date, end_date):
+    # Convert the input strings to datetime objects
+    start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    end_date = datetime.strptime(end_date, "%Y-%m-%d")
+    
+    # Get the weekday of the start date (0 = Monday, 6 = Sunday)
+    start_weekday = start_date.weekday()
+    
+    # Initialize an empty list to hold the matching dates
+    matching_dates = []
+    
+    # Iterate over the date range
+    current_date = start_date
+    while current_date <= end_date:
+        if current_date.weekday() == start_weekday:
+            matching_dates.append(current_date.strftime("%Y-%m-%d"))
+        current_date += timedelta(days=1)
+    
+    return matching_dates
+
 
 
 @app.route('/application/available_dates',methods=['POST'])
@@ -137,13 +157,46 @@ def request_details():
 def store_approval_rejection():
    sent_info = {
       "id" : 1,
-      "outcome":"approved"
+      "outcome":"approved",
    }
    try:
     sent_id = sent_info["id"]
     sent_outcome = sent_info["outcome"]
     if sent_outcome == "approved":
        application_response = supabase.table("application").update({"status": "approved"}).eq("application_id", sent_id).execute()
+       employee_id_response = supabase.table("application").select("staff_id","starting_date","end_date","request_type","timing").eq("application_id", sent_id).execute()
+       
+       employee_id_data = employee_id_response.data
+       request_type = employee_id_data[0]["request_type"]
+       staff_id = employee_id_data[0]["staff_id"]
+       timing = employee_id_data[0]["timing"]
+       if request_type == "recurring":
+          starting_date = employee_id_data[0]["starting_date"]
+          end_date = employee_id_data[0]["end_date"]
+          dates_between = get_matching_weekday_dates(starting_date,end_date)
+          for date in dates_between:
+             date = datetime.strptime(date, "%Y-%m-%d")
+             day = date.weekday()
+             weekDaysMapping = ("monday", "tuesday", 
+                   "wednesday", "thursday",
+                   "friday", "saturday",
+                   "sunday")
+             
+             schedule_response = supabase.table("schedule").update({weekDaysMapping[day] : timing}).lte('starting_date', date).gte("end_date", date).eq("staff_id",staff_id).execute()
+       elif request_type == "ad_hoc":
+          adhoc_date = employee_id_data[0]["starting_date"]
+          adhoc_date = datetime.strptime(adhoc_date, "%Y-%m-%d")
+          adhoc_day = adhoc_date.weekday()
+          weekDaysMapping = ("monday", "tuesday", 
+                   "wednesday", "thursday",
+                   "friday", "saturday",
+                   "sunday")
+          schedule_response = supabase.table("schedule").update({weekDaysMapping[adhoc_day] : timing}).lte('starting_date', adhoc_date).gte("end_date", adhoc_date).eq("staff_id",staff_id).execute()
+          
+          
+       
+
+
        return {"update database":"success"},200
     elif sent_outcome == "rejected":
        application_response = supabase.table("application").update({"status": "rejected"}).eq("application_id", sent_id).execute()
