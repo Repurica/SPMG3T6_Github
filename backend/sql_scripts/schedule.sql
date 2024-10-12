@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS schedule;
 
 CREATE TABLE schedule (
+    schedule_id INT NOT NULL PRIMARY KEY, -- unique schedule ID
     staff_id INT NOT NULL,  -- Staff ID for staff
     starting_date DATE NOT NULL, -- starting date of WFH arrangement
     end_date DATE, -- end date of WFH arrangement
@@ -15,5 +16,4 @@ CREATE TABLE schedule (
 
 
 
-    PRIMARY KEY (staff_id,starting_date,end_date) -- composite primary key to uniquely identify schedule based on date & am/pm
 );
