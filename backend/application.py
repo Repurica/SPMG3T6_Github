@@ -2,6 +2,7 @@ from flask import Flask,request
 from supabase_init import supabase
 from flask_cors import CORS
 app = Flask(__name__)
+import traceback
 from datetime import datetime, timedelta,date
 CORS(app)
 #helper function to get_dates_between_2_dates
@@ -102,6 +103,7 @@ def store_application():
 def retrieve_pending_requests():
    #test_manager_id = 140894
    json_sent = request.get_json()
+   print(json_sent["manager_id"])
    try:
      response_employee = supabase.table("employee").select("staff_id","staff_fname","staff_lname").eq("reporting_manager",json_sent["manager_id"]).execute()
      list_of_staff_ids = []
@@ -121,7 +123,21 @@ def retrieve_pending_requests():
         starting_date = record["starting_date"]
         end_date = record["end_date"]
         request_type = record["request_type"]
-        
+        if request_type=="recurring":
+           dates_between = get_matching_weekday_dates(starting_date,end_date)
+           for date in dates_between:
+              print(date)
+              response = get_current_manpower(date,json_sent["manager_id"])
+              print(response)
+              if response[0]["status"] == "invalid":
+                 record["capacity"]="invalid"
+                 break
+              record["capacity"]="valid"
+        else:
+           response = get_current_manpower(starting_date,json_sent["manager_id"])
+           status = response[0]["status"]
+           record["capacity"] = status
+
 
      sorted_data = sorted(returned_result, key=lambda x: datetime.fromisoformat(x["created_at"]))
      for item in sorted_data:
@@ -133,7 +149,7 @@ def retrieve_pending_requests():
 
 
    except Exception as e:
-        return {"info" : repr(e)}, 500
+        return {"info" : repr(e),"traceback": traceback.format_exc()}, 500
 
 
 
@@ -211,13 +227,13 @@ def store_approval_rejection():
    except Exception as e:
       return {"info" : repr(e)}, 500
    
-
+@app.route("/application/current_manpower")
 def get_current_manpower(date,test_manager_id):
    # today = date.today()
    # print(today)
    # current_day_of_week = datetime.now().strftime('%A').lower()
    # current_day_of_week = current_day_of_week.lower()
-   date_obj = datetime.strptime(date, "%y-%m-%d")
+   date_obj = datetime.strptime(date, "%Y-%m-%d")
    day_of_week = date_obj.strftime("%A")
    day_of_week = day_of_week.lower()
    # print(current_day_of_week)
