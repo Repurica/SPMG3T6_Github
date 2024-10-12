@@ -118,6 +118,10 @@ def retrieve_pending_requests():
      for record in returned_result:
         record_staff_id = record["staff_id"]
         record["staff_fullname"] = dict_staff_ids_names[record_staff_id]
+        starting_date = record["starting_date"]
+        end_date = record["end_date"]
+        request_type = record["request_type"]
+        
 
      sorted_data = sorted(returned_result, key=lambda x: datetime.fromisoformat(x["created_at"]))
      for item in sorted_data:
@@ -157,7 +161,7 @@ def request_details():
 def store_approval_rejection():
    sent_info = {
       "id" : 1,
-      "outcome":"approved",
+      "outcome":"approved"
    }
    try:
     sent_id = sent_info["id"]
@@ -183,6 +187,7 @@ def store_approval_rejection():
                    "sunday")
              
              schedule_response = supabase.table("schedule").update({weekDaysMapping[day] : timing}).lte('starting_date', date).gte("end_date", date).eq("staff_id",staff_id).execute()
+
        elif request_type == "ad_hoc":
           adhoc_date = employee_id_data[0]["starting_date"]
           adhoc_date = datetime.strptime(adhoc_date, "%Y-%m-%d")
@@ -206,14 +211,16 @@ def store_approval_rejection():
    except Exception as e:
       return {"info" : repr(e)}, 500
    
-@app.route("/application/current_manpower_team")
-def get_current_manpower():
-   today = date.today()
-   print(today)
-   current_day_of_week = datetime.now().strftime('%A').lower()
-   current_day_of_week = current_day_of_week.lower()
-   print(current_day_of_week)
-   test_manager_id = 140894
+
+def get_current_manpower(date,test_manager_id):
+   # today = date.today()
+   # print(today)
+   # current_day_of_week = datetime.now().strftime('%A').lower()
+   # current_day_of_week = current_day_of_week.lower()
+   date_obj = datetime.strptime(date, "%y-%m-%d")
+   day_of_week = date_obj.strftime("%A")
+   day_of_week = day_of_week.lower()
+   # print(current_day_of_week)
    try:
      
      response_employee = supabase.table("employee").select("staff_id","staff_fname","staff_lname").eq("reporting_manager",test_manager_id).execute()
@@ -222,16 +229,16 @@ def get_current_manpower():
      for staff_id_dict in response_employee.data:
         list_of_staff_ids.append(staff_id_dict["staff_id"])
      print(list_of_staff_ids)
-     schedule_response = supabase.table("schedule").select('*').lte('starting_date', today).gte("end_date", today).eq(current_day_of_week,"in_office").in_("staff_id",list_of_staff_ids).execute()
+     schedule_response = supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week,"in_office").in_("staff_id",list_of_staff_ids).execute()
      count_in_office = len(schedule_response.data) - 1
-     max_capacity_response = supabase.table("schedule").select('*').lte('starting_date', today).gte("end_date", today).in_("staff_id",list_of_staff_ids).execute()
+     max_capacity_response = supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).in_("staff_id",list_of_staff_ids).execute()
      max_capacity = len(max_capacity_response.data)
      percentage_capacity = count_in_office/max_capacity*100
      formatted_capacity = round(percentage_capacity, 2)  
      if formatted_capacity<50:
-       return {"percentage_capacity": formatted_capacity, "status" : "invalid"},200
+       return { "status" : "invalid"},200
      else:
-       return {"percentage_capacity": formatted_capacity , "status" : "valid"},200
+       return { "status" : "valid"},200
    
    except Exception as e:
       return {"info" : repr(e)}, 500
