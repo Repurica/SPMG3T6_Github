@@ -192,3 +192,6 @@ def get_team_schedules():
         "schedules": all_schedules,
         "staff_data": all_staff_data
     })
+
+
+# use http://127.0.0.1:5000/schedule/team_schedules?staff_id=140003 for testing
