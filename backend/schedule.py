@@ -90,3 +90,80 @@ def get_staff_schedules():
 
 
 
+@schedule.route('/team_schedules_by_staff', methods=['GET'])
+def get_team_schedules_by_staff():
+    # Get the staff_id from the request
+    staff_id = request.args.get('staff_id')
+    
+    # Fetch the staff data based on the given staff_id
+    staff_data = supabase.table('employee') \
+        .select('staff_fname, staff_lname, staff_id, position, role') \
+        .eq('staff_id', staff_id) \
+        .execute()
+
+    # Check if the staff exists
+    if not staff_data.data:
+        return jsonify({"error": "Staff not found."}), 404
+    
+    # Get the position and role of the given staff
+    position = staff_data.data[0]['position']
+    role = staff_data.data[0]['role']
+    
+    # Fetch all staff members with the same position (the team)
+    team_data = supabase.table('employee') \
+        .select('staff_fname, staff_lname, staff_id, position, role') \
+        .eq('position', position) \
+        .execute()
+
+    # Check if any team members found
+    if not team_data.data:
+        return jsonify({"error": "No team members found with this position."}), 404
+
+    # Initialize list to hold all staff data with their schedules
+    team_schedule_data = []
+
+    # Fetch schedules for each team member
+    for staff in team_data.data:
+        team_member_id = staff['staff_id']
+
+        # Fetch schedules for each team member
+        schedules = supabase.table('schedule') \
+            .select("*") \
+            .eq('staff_id', team_member_id) \
+            .execute()
+
+        # Prepare the list of schedules for this team member
+        staff_schedules = []
+        if schedules.data:
+            starting_date = datetime.strptime(schedules.data[0]['starting_date'], '%Y-%m-%d')
+
+            # Iterate through each schedule and build schedule entries
+            for schedule in schedules.data:
+                for day, offset in day_offsets.items():
+                    wfh_status = schedule.get(day)
+                    if wfh_status:
+                        start_time, end_time = time_ranges.get(wfh_status, ("08:00:00", "18:00:00"))
+                        day_date = starting_date + timedelta(days=offset)
+
+                        start_date_str = f"{day_date.strftime('%Y-%m-%d')}T{start_time}+08:00"
+                        end_date_str = f"{day_date.strftime('%Y-%m-%d')}T{end_time}+08:00"
+
+                        staff_schedules.append({
+                            'startDate': datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
+                            'endDate': datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
+                            'wfh': wfh_status
+                        })
+
+        # Add team member's data and their schedules to the final list
+        team_schedule_data.append({
+            'staff_name': f"{staff['staff_fname']} {staff['staff_lname']}",
+            'staff_id': staff['staff_id'],
+            'position': staff['position'],
+            'role': staff['role'],  # Include the role if necessary
+            'schedules': staff_schedules
+        })
+
+    # Return the final list of team members with their schedules
+    return jsonify(team_schedule_data)
+
+
