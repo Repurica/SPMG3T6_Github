@@ -3,7 +3,7 @@ import './DetailedRequestModal.css';
 
 const DetailedRequestModal = ({ isOpen, selectedItem, reason, setReason, handleAccept, handleReject, handleClose }) => {
   if (!isOpen || !selectedItem) {
-    return null; // Do not render the modal if it's not open
+    return null;
   }
 
   return (

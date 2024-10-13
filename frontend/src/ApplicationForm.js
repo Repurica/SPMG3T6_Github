@@ -3,6 +3,8 @@ import DatePicker from 'react-datepicker';
 import ApplicationNotificationModal from './ApplicationNotificationModal';
 import 'react-datepicker/dist/react-datepicker.css'; // Import CSS for DatePicker
 import './ApplicationForm.css'
+import { fetchWithRetry } from './FetchWithRetry';
+
 // Get date ranges of 2 months before and 3 months after
 const getDateRanges = () => {
   const today = new Date();
@@ -39,32 +41,26 @@ function ApplicationForm() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/application/available_dates', {
+        const response = await fetchWithRetry('http://localhost:5000/application/available_dates', {
           method: 'POST', 
           headers: {
             'Content-Type': 'application/json', // Send JSON data
           },
           body: JSON.stringify({ staff_id: staffId }), // Data to be sent on page load
-        });
+        },3, 1000); // 3 retries with a 1 second delay between retries
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-
-        }
 
         const result = await response.json();
-        setData(result['results']);
-        setError(null)
-      } catch (err) {
-        console.log(err.message);
-         // display error message for now
-         setError(err.message)
-      }
-
-    };
+        setData(result);
+        setError(null); // Clear any previous errors
+        } catch (err) {
+            console.log(err.message);
+            setError(err.message); // Display error message
+        }
+      };
 
     fetchData();
-  }, []);
+}, []);
 
     //when both start and end date present
     useEffect(() => {

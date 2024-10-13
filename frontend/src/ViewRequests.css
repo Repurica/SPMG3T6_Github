@@ -23,6 +23,7 @@
     padding: 10px;
     font-family: Arial, sans-serif;
     background-color: #f9f9f9;
+    padding-bottom: 80px;
 }
 
 h1 {
@@ -46,7 +47,6 @@ h1 {
 
 .request-card:hover {
     background-color: #f9f9f9;
-    transform: scale(1.02);
     cursor: pointer;
 }
 
