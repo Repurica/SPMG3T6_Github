@@ -47,11 +47,11 @@ function ApplicationForm() {
             'Content-Type': 'application/json', // Send JSON data
           },
           body: JSON.stringify({ staff_id: staffId }), // Data to be sent on page load
-        },3, 1000); // 3 retries with a 1 second delay between retries
+        },3, 2000); // 3 retries with a 2 second delay between retries
 
 
         const result = await response.json();
-        setData(result);
+        setData(result["results"]);
         setError(null); // Clear any previous errors
         } catch (err) {
             console.log(err.message);

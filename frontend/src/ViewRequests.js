@@ -77,7 +77,7 @@ function ViewRequests() {
                         'Content-Type': 'application/json', // Send JSON data
                     },
                     body: JSON.stringify({ manager_id: test_manager_id }), // Data to be sent on page load
-                }, 3, 1000); // 3 retries with a 1 second delay between retries
+                }, 3, 2000); // 3 retries with a 1 second delay between retries
 
                 const result = await response.json();
                 setData(result);
