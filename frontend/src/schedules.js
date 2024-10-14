@@ -7,14 +7,14 @@ export const schedules = [
   },
   {   
     staff_id: 14108,
-    startDate: new Date('2024-08-01T08:00:00+08:00'),
-    endDate: new Date('2024-08-01T12:00:00+08:00'),
+    startDate: new Date('2024-08-06T08:00:00+08:00'),
+    endDate: new Date('2024-08-06T12:00:00+08:00'),
     wfh: 'AM WFH',
   },
   {   
     staff_id: 14108,
-    startDate: new Date('2025-01-03T08:00:00+08:00'),
-    endDate: new Date('2025-01-03T12:00:00+08:00'),
+    startDate: new Date('2025-01-06T08:00:00+08:00'),
+    endDate: new Date('2025-01-06T12:00:00+08:00'),
     wfh: 'AM WFH',
   },
   {   
@@ -30,7 +30,7 @@ export const schedules = [
     wfh: 'Full Day WFH',
   },
 ];
-export const staff_data = [
+export const staffData = [
   {
     staff_name: 'Ben',
     staff_id: 14108,
