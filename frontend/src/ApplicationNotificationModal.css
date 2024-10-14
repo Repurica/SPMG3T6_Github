@@ -7,6 +7,9 @@
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow */
   text-align: left; /* Align text to the left */
+  width: 20%;
+  word-wrap: break-word;
+  z-index: 2000;
 }
   
   .modal h2 {
@@ -17,6 +20,7 @@
   }
   
   .modal p {
+    text-align: center;
     font-size: 16px; /* Standard font size for the notification message */
     margin-bottom: 20px; /* Space below the message */
   }
