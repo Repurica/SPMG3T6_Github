@@ -8,14 +8,16 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2000
   }
   
   .modal-content {
     background: white;
     padding: 20px;
     border-radius: 8px;
-    width: 800px;
+    width: 80%;
     position: relative;
+    word-wrap: break-word;    
   }
   
   .close-btn {
@@ -79,3 +81,6 @@
     margin: 0;                  /* Remove default margin from the paragraph */
   }
   
+  label {
+    font-weight: bold;
+  }

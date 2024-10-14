@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ViewRequests.css'; // Import the CSS file
 import { FaInbox } from 'react-icons/fa'; // Import the inbox icon
 import DetailedRequestModal from './DetailedRequestModal';
+import { fetchWithRetry } from './FetchWithRetry';
 
 function ViewRequests() {
     const [data, setData] = useState([]);
@@ -13,7 +14,7 @@ function ViewRequests() {
     
     const test_manager_id = 140894
 
-    const itemsPerPage = 4;
+    const itemsPerPage = 3;
 
 
     const totalItems = Object.keys(data).length; // Total number of requests
@@ -69,33 +70,26 @@ function ViewRequests() {
     // fetch data from application.py
     useEffect(() => {
         const fetchData = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/application/retrieve_pending_requests', {
-            method: 'POST', 
-            headers: {
-                'Content-Type': 'application/json', // Send JSON data
-            },
-            body: JSON.stringify({ manager_id: test_manager_id }), // Data to be sent on page load
-            });
+            try {
+                const response = await fetchWithRetry('http://localhost:5000/application/retrieve_pending_requests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json', // Send JSON data
+                    },
+                    body: JSON.stringify({ manager_id: test_manager_id }), // Data to be sent on page load
+                }, 3, 2000); // 3 retries with a 1 second delay between retries
 
-            if (!response.ok) {
-            throw new Error('Failed to fetch data');
-
+                const result = await response.json();
+                setData(result);
+                setError(null); // Clear any previous errors
+            } catch (err) {
+                console.log(err.message);
+                setError(err.message); // Display error message
             }
-
-            const result = await response.json();
-            setData(result);
-            setError(null)
-        } catch (err) {
-            console.log(err.message);
-            // display error message for now
-            setError(err.message)
-        }
-
         };
 
         fetchData();
-    }, []);
+        }, []);
     console.log(data)
 
 

@@ -1,10 +1,8 @@
 from flask import Flask
+from flask_cors import CORS
+
 app = Flask(__name__)
-
-
-
-
-
+CORS(app)  # Enable CORS for the entire app
 
 # importing and registering the blueprint
 # test this endpoint at 
@@ -16,13 +14,9 @@ app.register_blueprint(sample, url_prefix="/sample")
 from schedule import schedule
 app.register_blueprint(schedule, url_prefix="/schedule")
 
-
 @app.route('/')
 def home():
     return "running!!"
 
 if __name__ == '__main__':
-
     app.run(debug=True)
-    
-    
