@@ -1,10 +1,12 @@
-from flask import Flask,request
+from flask import Flask,request,Blueprint
 from supabase_init import supabase
 from flask_cors import CORS
 app = Flask(__name__)
 import traceback
 from datetime import datetime, timedelta,date
 CORS(app)
+
+application = Blueprint('application', __name__)
 #helper function to get_dates_between_2_dates
 def get_dates_on_same_weekday(start_date_str, end_date_str):
     start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
@@ -46,7 +48,7 @@ def get_matching_weekday_dates(start_date, end_date):
 
 
 
-@app.route('/application/available_dates',methods=['POST'])
+@app.route('/available_dates',methods=['POST'])
 #function that returns all dates at which requests have already been made
 def return_available_dates():
     json_sent = request.get_json()
@@ -81,7 +83,7 @@ def return_available_dates():
                "info" : repr(e)}, 500
 
 
-@app.route('/application/store_application',methods=['POST'])
+@app.route('/store_application',methods=['POST'])
 def store_application():
     json_sent = request.get_json()
 
@@ -99,7 +101,7 @@ def store_application():
 
 
 
-@app.route('/application/retrieve_pending_requests',methods=['POST'])
+@app.route('/retrieve_pending_requests',methods=['POST'])
 def retrieve_pending_requests():
    #test_manager_id = 140894
    json_sent = request.get_json()
@@ -153,7 +155,7 @@ def retrieve_pending_requests():
 
 
 
-@app.route("/application/specific_request")
+@app.route("/specific_request")
 def request_details():
    test_request_id = 1
    try:
@@ -173,7 +175,7 @@ def request_details():
       return {"info" : repr(e)}, 500
    
   
-@app.route("/application/store_approval_rejection")
+@app.route("/store_approval_rejection")
 def store_approval_rejection():
    sent_info = {
       "id" : 1,
@@ -227,7 +229,7 @@ def store_approval_rejection():
    except Exception as e:
       return {"info" : repr(e)}, 500
    
-@app.route("/application/current_manpower")
+@app.route("/current_manpower")
 def get_current_manpower(date,test_manager_id):
    # today = date.today()
    # print(today)
