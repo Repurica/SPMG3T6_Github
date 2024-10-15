@@ -14,6 +14,11 @@ app.register_blueprint(sample, url_prefix="/sample")
 from schedule import schedule
 app.register_blueprint(schedule, url_prefix="/schedule")
 
+from application import application
+app.register_blueprint(application, url_prefix='/application')
+
+for rule in app.url_map.iter_rules():
+    print(f"Endpoint: {rule.endpoint}, Route: {rule}")
 @app.route('/')
 def home():
     return "running!!"
