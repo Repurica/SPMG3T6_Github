@@ -1,4 +1,4 @@
-
+# 14-10 HT edited time_ranges
 
 
 from flask import Blueprint, request, jsonify
@@ -31,10 +31,10 @@ def get_staff_schedules():
 
     # Define time ranges based on WFH status
     time_ranges = {
-        'AM': ("08:00:00", "12:00:00"),
-        'PM': ("12:00:00", "18:00:00"),
-        'Whole day': ("08:00:00", "18:00:00"),
-        'in-office': ("08:00:00", "18:00:00")
+        'AM': ("09:00:00", "13:00:00"),
+        'PM': ("14:00:00", "18:00:00"),
+        'Whole day': ("09:00:00", "18:00:00"),
+        'in-office': ("09:00:00", "18:00:00")
     }
 
     # Map day names to offsets from the starting date
@@ -54,7 +54,7 @@ def get_staff_schedules():
             wfh_status = schedule.get(day)
             if wfh_status:  # If the day has a schedule
                 # Get the appropriate start and end times for the WFH status
-                start_time, end_time = time_ranges.get(wfh_status, ("08:00:00", "18:00:00"))
+                start_time, end_time = time_ranges.get(wfh_status, ("09:00:00", "18:00:00"))
 
                 # Calculate the actual date for this day
                 day_date = starting_date + timedelta(days=offset)
@@ -120,10 +120,10 @@ def get_team_schedules():
 
     # Define work-from-home time ranges
     time_ranges = {
-        'AM': ("08:00:00", "12:00:00"),
-        'PM': ("12:00:00", "18:00:00"),
-        'Whole day': ("08:00:00", "18:00:00"),
-        'in-office': ("08:00:00", "18:00:00")
+        'AM': ("09:00:00", "13:00:00"),
+        'PM': ("14:00:00", "18:00:00"),
+        'Whole day': ("09:00:00", "18:00:00"),
+        'in-office': ("09:00:00", "18:00:00")
     }
 
     # Define day offsets for weekdays
@@ -159,7 +159,7 @@ def get_team_schedules():
                 for day, offset in day_offsets.items():
                     wfh_status = schedule.get(day)
                     if wfh_status:
-                        start_time, end_time = time_ranges.get(wfh_status, ("08:00:00", "18:00:00"))
+                        start_time, end_time = time_ranges.get(wfh_status, ("09:00:00", "18:00:00"))
                         day_date = starting_date + timedelta(days=offset)
 
                         start_date_str = f"{day_date.strftime('%Y-%m-%d')}T{start_time}+08:00"
