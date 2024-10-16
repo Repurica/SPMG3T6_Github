@@ -7,8 +7,7 @@ const ApplicationNotificationModal = ({ message, onClose }) => {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>Notification</h2>
-        <p>{message}</p>
+        <h2>{message}</h2>
         <button onClick={onClose}>Close</button>
       </div>
     </div>
