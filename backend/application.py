@@ -162,13 +162,15 @@ def request_details():
 def store_approval_rejection():
    sent_info = {
       "id": 1,
-      "outcome": "approved"
+      "outcome": "approved",
+      "outcome_reason" : "test reason"
    }
    try:
       sent_id = sent_info["id"]
       sent_outcome = sent_info["outcome"]
+      outcome_reason = sent_info["outcome_reason"]
       if sent_outcome == "approved":
-         application_response = supabase.table("application").update({"status": "approved"}).eq("application_id", sent_id).execute()
+         application_response = supabase.table("application").update({"status": "approved","outcome_reason": outcome_reason}).eq("application_id", sent_id).execute()
          employee_id_response = supabase.table("application").select("staff_id", "starting_date", "end_date", "request_type", "timing").eq("application_id", sent_id).execute()
          
          employee_id_data = employee_id_response.data
