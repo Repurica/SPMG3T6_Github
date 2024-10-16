@@ -158,17 +158,19 @@ def request_details():
    except Exception as e:
       return {"info": repr(e)}, 500
 
-@application.route("/store_approval_rejection")
+@application.route("/store_approval_rejection",  methods=['POST'])
 def store_approval_rejection():
-   sent_info = {
-      "id": 1,
-      "outcome": "approved",
-      "outcome_reason" : "test reason"
-   }
+   # sent_info = {
+   #    "id": 1,
+   #    "outcome": "approved",
+   #    "outcome_reason" : "test reason"
+   # }
+   json_sent = request.get_json()
+
    try:
-      sent_id = sent_info["id"]
-      sent_outcome = sent_info["outcome"]
-      outcome_reason = sent_info["outcome_reason"]
+      sent_id = json_sent["id"]
+      sent_outcome = json_sent["outcome"]
+      outcome_reason = json_sent["outcome_reason"]
       if sent_outcome == "approved":
          application_response = supabase.table("application").update({"status": "approved","outcome_reason": outcome_reason}).eq("application_id", sent_id).execute()
          employee_id_response = supabase.table("application").select("staff_id", "starting_date", "end_date", "request_type", "timing").eq("application_id", sent_id).execute()
