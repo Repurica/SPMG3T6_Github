@@ -3,6 +3,7 @@ import './ViewRequests.css'; // Import the CSS file
 import { FaInbox } from 'react-icons/fa'; // Import the inbox icon
 import DetailedRequestModal from './DetailedRequestModal';
 import { fetchWithRetry } from './FetchWithRetry';
+import ApplicationNotificationModal from './ApplicationNotificationModal';
 
 function ViewRequests() {
     const [data, setData] = useState([]);
@@ -11,7 +12,9 @@ function ViewRequests() {
     const [selectedItem, setSelectedItem] = useState(null);
     const [reason, setReason] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    
+    const [loading, setLoading] = useState(true);
+    const [notification, setNotification] = useState('');
+
     const test_manager_id = 140894
 
     const itemsPerPage = 3;
@@ -29,8 +32,11 @@ function ViewRequests() {
 
     const currentItems = getCurrentItems();
 
-
-
+    //for after modal after approve/reject
+    const handleClose = () => {
+        window.location.reload(); // Refresh Page
+      };
+    
 
 
 
@@ -53,16 +59,77 @@ function ViewRequests() {
         setReason("");
       };
     
-      const handleAccept = () => {
-        console.log("Accepted:", selectedItem);
-        console.log("Reason:", reason);
-        handleCloseModal();
+      const handleAccept = async () => {
+        if (reason.trim() === ''){
+            alert('Enter a reason for approval!')
+        }
+        else {
+            console.log("Accepted:", selectedItem);
+            console.log("Reason:", reason);
+            let toSend = { 
+                "id" : selectedItem['application_id'],
+                "outcome": "approved",
+                "outcome_reason" : reason      
+             }         
+             try {
+                const response = await fetch('http://localhost:5000/application/store_approval_rejection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(toSend),
+                });
+        
+                if (response.ok) {
+                    const jsonResponse = await response.json();
+                    console.log('Success:', jsonResponse);
+                    setNotification(`Request Approved!`);
+                } else {
+                    console.error('Error:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+
+
+        }
       };
     
-      const handleReject = () => {
-        console.log("Rejected:", selectedItem);
-        console.log("Reason:", reason);
-        handleCloseModal();
+      const handleReject = async() => {
+        if (reason.trim() === ''){
+            alert('Enter a reason for rejection!')
+        }
+        else{
+            console.log("Rejected:", selectedItem);
+            console.log("Reason:", reason);
+            let toSend = { 
+                "id" : selectedItem['application_id'],
+                "outcome": "rejected",
+                "outcome_reason" : reason      
+             }          
+             try {
+                const response = await fetch('http://localhost:5000/application/store_approval_rejection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(toSend),
+                });
+        
+                if (response.ok) {
+                    const jsonResponse = await response.json();
+                    console.log('Success:', jsonResponse);
+                    setNotification(`Request Rejected!`);
+                } else {
+                    console.error('Error:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+
+
+    
+        }
       }
 
 
@@ -70,6 +137,7 @@ function ViewRequests() {
     // fetch data from application.py
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const response = await fetchWithRetry('http://localhost:5000/application/retrieve_pending_requests', {
                     method: 'POST',
@@ -85,18 +153,21 @@ function ViewRequests() {
             } catch (err) {
                 console.log(err.message);
                 setError(err.message); // Display error message
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchData();
         }, []);
-    console.log(data)
 
+    if (loading) {
+        return <h1>Loading...</h1>;
+    }
 
     if (error){
         return (<h1>Error occured fetching data.</h1>)
       }
-      else {
     
     return (
         <div className="container">
@@ -150,6 +221,7 @@ function ViewRequests() {
                         handleClose={handleCloseModal}
                         />
             </div>
+            <ApplicationNotificationModal message={notification} onClose={handleClose} /> 
             <div className="pagination">
                 <button className="navigate" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
                     Previous
@@ -161,6 +233,6 @@ function ViewRequests() {
             </div>
         </div>
     );
-}}
+}
 
 export default ViewRequests;
