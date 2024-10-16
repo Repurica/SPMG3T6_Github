@@ -121,13 +121,13 @@ def retrieve_pending_requests():
             for date in dates_between:
                print(date)
                response = get_current_manpower(date, json_sent["manager_id"])
-               print(response)
                if response[0]["status"] == "invalid":
                   record["capacity"] = "invalid"
                   break
                record["capacity"] = "valid"
          else:
             response = get_current_manpower(starting_date, json_sent["manager_id"])
+            print(response)
             status = response[0]["status"]
             record["capacity"] = status
 
@@ -142,21 +142,7 @@ def retrieve_pending_requests():
    except Exception as e:
       return {"info": repr(e), "traceback": traceback.format_exc()}, 500
 
-@application.route("/specific_request")
-def request_details():
-   test_request_id = 1
-   try:
-      response_application = supabase.table("application").select("reason", "staff_id", "created_at", "starting_date", "end_date", "timing", "request_type").eq("application_id", test_request_id).execute()
-      application_data = response_application.data
-      staff_id = application_data[0]["staff_id"]
-      employee_response = supabase.table("employee").select("staff_fname", "staff_lname").eq("staff_id", staff_id).execute()
-      employee_data = employee_response.data
-      returned_data = response_application.data
-      returned_data[0]["employee_fullname"] = employee_data[0]["staff_fname"] + " " + employee_data[0]["staff_lname"]
 
-      return returned_data, 200
-   except Exception as e:
-      return {"info": repr(e)}, 500
 
 @application.route("/store_approval_rejection")
 def store_approval_rejection():
@@ -210,7 +196,7 @@ def store_approval_rejection():
    except Exception as e:
       return {"info": repr(e)}, 500
 
-@application.route("/current_manpower")
+
 def get_current_manpower(date, test_manager_id):
    date_obj = datetime.strptime(date, "%Y-%m-%d")
    day_of_week = date_obj.strftime("%A").lower()
@@ -233,5 +219,30 @@ def get_current_manpower(date, test_manager_id):
          return {"status": "valid"}, 200
    except Exception as e:
       return {"info": repr(e)}, 500
+@application.route("/get_all_requests_staff")  
+def get_all_requests_staff():
+   test_staff_id = 140003
+   try:
+     
+     application_response = supabase.table("application").select("*").eq("staff_id", test_staff_id).execute()
+
+     return application_response.data,200
+   except Exception as e:
+      return {"info": repr(e)}, 500
 
 
+# @application.route("/specific_request")
+# def request_details():
+#    test_request_id = 1
+#    try:
+#       response_application = supabase.table("application").select("reason", "staff_id", "created_at", "starting_date", "end_date", "timing", "request_type").eq("application_id", test_request_id).execute()
+#       application_data = response_application.data
+#       staff_id = application_data[0]["staff_id"]
+#       employee_response = supabase.table("employee").select("staff_fname", "staff_lname").eq("staff_id", staff_id).execute()
+#       employee_data = employee_response.data
+#       returned_data = response_application.data
+#       returned_data[0]["employee_fullname"] = employee_data[0]["staff_fname"] + " " + employee_data[0]["staff_lname"]
+
+#       return returned_data, 200
+#    except Exception as e:
+#       return {"info": repr(e)}, 500
