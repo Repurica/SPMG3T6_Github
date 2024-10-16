@@ -1,0 +1,12 @@
+.options {
+    padding: 5px;
+    padding-right: 15px;
+    background-color: rgba(191, 191, 191, 0.15);
+    margin-bottom: 0px;
+    text-align: right;
+  }
+  
+  .option {
+    margin-bottom: 0px;
+    display: inline-block;
+  }
