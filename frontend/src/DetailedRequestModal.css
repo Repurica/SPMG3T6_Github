@@ -57,6 +57,12 @@
     background-color: green;
   }
   
+  .accept-btn:disabled {
+    background-color: #ccc; /* Light grey */
+    cursor: not-allowed;
+
+  }
+
   .reject-btn {
     background-color: red;
   }
@@ -83,4 +89,9 @@
   
   label {
     font-weight: bold;
+  }
+
+  .insufficient-manpower {
+    font-weight: bold;
+    color: red;
   }

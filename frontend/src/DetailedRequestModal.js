@@ -35,8 +35,10 @@ const DetailedRequestModal = ({ isOpen, selectedItem, reason, setReason, handleA
           placeholder="Enter reason here (Max 300 characters)"
         />
 
+        {selectedItem.capacity === 'invalid' && (<p class='insufficient-manpower'>Manpower in office is insufficient (&lt;= 50%)</p>)}
+
         <div className="modal-actions">
-          <button className="accept-btn" onClick={handleAccept}>Accept</button>
+          <button className="accept-btn" onClick={handleAccept} disabled ={selectedItem.capacity === 'invalid'}>Accept</button>
           <button className="reject-btn" onClick={handleReject}>Reject</button>
         </div>
       </div>
