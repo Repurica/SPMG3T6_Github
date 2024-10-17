@@ -236,9 +236,11 @@ def get_current_manpower(date, test_manager_id):
          return {"status": "valid"}, 200
    except Exception as e:
       return {"info": repr(e)}, 500
-@application.route("/get_all_requests_staff")  
+@application.route("/get_all_requests_staff", methods=['POST'])   
 def get_all_requests_staff():
-   test_staff_id = 140003
+   #test_staff_id = 140003
+   json_sent = request.get_json()
+   test_staff_id = json_sent['staff_id']
    try:
      
      application_response = supabase.table("application").select("*").eq("staff_id", test_staff_id).execute()

@@ -1,0 +1,145 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.inbox-icon {
+    font-size: 24px;
+}
+
+.request-count {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.container {
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    padding-bottom: 80px;
+}
+
+h1 {
+    text-align: center;
+    color: black;
+}
+
+.request-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 13px;
+    margin: 13px 0;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative; /* Position relative for absolute positioning of buttons */
+    word-wrap: break-word;
+}
+
+.request-card p {
+    margin: 3px 0;
+}
+
+.request-card:hover {
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+.request-card:active {
+    background-color: #f1f1f1;
+}
+
+.staff-name {
+    font-size: 1.5em; /* Make the name larger */
+    color: black; /* Use a bold, standout color */
+    font-weight: bold; /* Make the name bold */
+    text-transform: uppercase; /* Capitalize the name */
+}
+
+/* General styling for the rest of the text */
+.detail-text {
+    font-size: 1.1em;
+    color: #333333; /* Subtle dark color for details */
+    font-weight: normal;
+}
+
+/* Strong emphasis for the labels (e.g., 'Application Date') */
+.detail-label {
+    font-weight: bold;
+    color: #333; /* Different color for labels */
+}
+
+
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+
+button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.navigate:disabled {
+    background-color: #ccc; /* Light grey */
+    cursor: not-allowed;
+}
+
+.navigate:not(:disabled):hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.page-info {
+    margin: 0 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.container {
+    position: relative; /* Position relative for absolute positioning of buttons */
+}
+
+
+.action-button {
+    margin-left: 5px; /* Space between buttons */
+    padding: 8px 12px; /* Adjust padding for button size */
+    color: white;      /* White text color */
+    border: none;      /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;    /* Pointer cursor on hover */
+}
+
+.button-container {
+    position: absolute; /* Position absolute to place it in the top right */
+    top: 10px;         /* Adjust top margin as needed */
+    right: 10px;       /* Adjust right margin as needed */
+}
+
+.withdraw-button {
+    margin-left: 5px; /* Space between buttons */
+    padding: 8px 12px; /* Adjust padding for button size */
+    background-color: blue; /* Green background for approve button */
+    color: white;      /* White text color */
+    border: none;      /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;    /* Pointer cursor on hover */
+}
+
+.withdraw-button:hover {
+    opacity: 0.8;      /* Slight transparency on hover */
+}
