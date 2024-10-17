@@ -82,7 +82,7 @@ def store_application():
    json_sent = request.get_json()
 
    try:
-      count_records = supabase.from_("application").select("*", count="exact").execute()
+      count_records = supabase.table("application").select("*", count="exact").execute()
       json_sent["application_id"] = count_records.count + 1
       json_sent["status"] = "pending"
       response = supabase.table("application").insert(json_sent).execute()
@@ -144,59 +144,74 @@ def retrieve_pending_requests():
 
 
 
-@application.route("/store_approval_rejection",  methods=['POST'])
+@application.route("/store_approval_rejection", methods=['POST'])
 def store_approval_rejection():
-   # sent_info = {
-   #    "id": 1,
-   #    "outcome": "approved",
-   #    "outcome_reason" : "test reason"
-   # }
-   json_sent = request.get_json()
+    json_sent = request.get_json()
+    
+    try:
+        sent_id = json_sent["id"]
+        sent_outcome = json_sent["outcome"]
+        outcome_reason = json_sent.get("outcome_reason", "")
+        
+        if sent_outcome == "approved":
+            # Update application table with approval
+            application_response = supabase.table("application").update(
+                {"status": "approved", "outcome_reason": outcome_reason}
+            ).eq("application_id", sent_id).execute()
 
-   try:
-      sent_id = json_sent["id"]
-      sent_outcome = json_sent["outcome"]
-      outcome_reason = json_sent["outcome_reason"]
-      if sent_outcome == "approved":
-         application_response = supabase.table("application").update({"status": "approved","outcome_reason": outcome_reason}).eq("application_id", sent_id).execute()
-         employee_id_response = supabase.table("application").select("staff_id", "starting_date", "end_date", "request_type", "timing").eq("application_id", sent_id).execute()
-         
-         employee_id_data = employee_id_response.data
-         request_type = employee_id_data[0]["request_type"]
-         staff_id = employee_id_data[0]["staff_id"]
-         timing = employee_id_data[0]["timing"]
-         if request_type == "recurring":
-            starting_date = employee_id_data[0]["starting_date"]
-            end_date = employee_id_data[0]["end_date"]
-            dates_between = get_matching_weekday_dates(starting_date, end_date)
-            for date in dates_between:
-               date = datetime.strptime(date, "%Y-%m-%d")
-               day = date.weekday()
-               weekDaysMapping = ("monday", "tuesday", 
-                  "wednesday", "thursday",
-                  "friday", "saturday",
-                  "sunday")
-               
-               schedule_response = supabase.table("schedule").update({weekDaysMapping[day]: timing}).lte('starting_date', date).gte("end_date", date).eq("staff_id", staff_id).execute()
+            employee_id_response = supabase.table("application").select(
+                "staff_id", "starting_date", "end_date", "request_type", "timing"
+            ).eq("application_id", sent_id).execute()
 
-         elif request_type == "ad_hoc":
-            adhoc_date = employee_id_data[0]["starting_date"]
-            adhoc_date = datetime.strptime(adhoc_date, "%Y-%m-%d")
-            adhoc_day = adhoc_date.weekday()
-            weekDaysMapping = ("monday", "tuesday", 
-               "wednesday", "thursday",
-               "friday", "saturday",
-               "sunday")
-            schedule_response = supabase.table("schedule").update({weekDaysMapping[adhoc_day]: timing}).lte('starting_date', adhoc_date).gte("end_date", adhoc_date).eq("staff_id", staff_id).execute()
-         
-         return {"update database": "success"}, 200
-      elif sent_outcome == "rejected":
-         application_response = supabase.table("application").update({"status": "rejected"}).eq("application_id", sent_id).execute()
-         return {"update database": "success"}, 200
-      else:
-         return {"update database": "succeeded but outcome is neither rejected or approved"}, 404
-   except Exception as e:
-      return {"info": repr(e)}, 500
+            employee_id_data = employee_id_response.data
+            request_type = employee_id_data[0]["request_type"]
+            staff_id = employee_id_data[0]["staff_id"]
+            timing = employee_id_data[0]["timing"]
+
+            if request_type == "recurring":
+                starting_date = employee_id_data[0]["starting_date"]
+                end_date = employee_id_data[0]["end_date"]
+                dates_between = get_matching_weekday_dates(starting_date, end_date)
+
+                for date in dates_between:
+                    date = datetime.strptime(date, "%Y-%m-%d")
+                    day = date.weekday()
+                    weekDaysMapping = (
+                        "monday", "tuesday", "wednesday", "thursday",
+                        "friday", "saturday", "sunday"
+                    )
+                    schedule_response = supabase.table("schedule").update(
+                        {weekDaysMapping[day]: timing}
+                    ).lte('starting_date', date).gte("end_date", date).eq("staff_id", staff_id).execute()
+
+            elif request_type == "ad_hoc":
+                adhoc_date = employee_id_data[0]["starting_date"]
+                adhoc_date = datetime.strptime(adhoc_date, "%Y-%m-%d")
+                adhoc_day = adhoc_date.weekday()
+                weekDaysMapping = (
+                    "monday", "tuesday", "wednesday", "thursday",
+                    "friday", "saturday", "sunday"
+                )
+                schedule_response = supabase.table("schedule").update(
+                    {weekDaysMapping[adhoc_day]: timing}
+                ).lte('starting_date', adhoc_date).gte("end_date", adhoc_date).eq("staff_id", staff_id).execute()
+
+            return {"update database": "success"}, 200
+
+        elif sent_outcome == "rejected":
+            # Update application table with rejection
+            application_response = supabase.table("application").update(
+                {"status": "rejected", "outcome_reason": outcome_reason}
+            ).eq("application_id", sent_id).execute()
+
+            return {"update database": "success"}, 200
+
+        else:
+            return {"update database": "outcome not recognized"}, 404
+
+    except Exception as e:
+        return {"info": repr(e)}, 500
+
 
 
 def get_current_manpower(date, test_manager_id):
