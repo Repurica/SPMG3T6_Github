@@ -19,6 +19,9 @@ function StaffScheduler() {
       setCurrentResource(e.value);
     }, []);
 
+    const [currentView, setCurrentView] = useState('Day');  
+
+
     const groups = ['staff_id'];
 
     useEffect(() => {
@@ -73,14 +76,20 @@ function StaffScheduler() {
 
     return (
         <React.Fragment>
-            <div className="options">
+            <div className="utility">
+                {currentView == 'Day' && currentResource == 'Team Schedule' && (
+                    <div className="ppl_count">
+                        <p>AM Count: {getSchedule().filter(item => item.wfh == 'AM').length} In Office, {staffData.length} WFH</p>
+                        <p>PM Count: {staffData.length} In Office, {staffData.length} WFH</p>
+                    </div>
+                )}
                 <div className="option">
-                <RadioGroup
-                    items={resourcesList}
-                    value={currentResource}
-                    layout="horizontal"
-                    onValueChanged={onRadioGroupValueChanged}
-                />
+                    <RadioGroup
+                        items={resourcesList}
+                        value={currentResource}
+                        layout="horizontal"
+                        onValueChanged={onRadioGroupValueChanged}
+                    />
                 </div>
             </div>
             <Scheduler id='scheduler'
@@ -93,7 +102,10 @@ function StaffScheduler() {
                 defaultCurrentView="timelineDay"
                 min={startDate}
                 max={endDate}
-                height={700}>
+                height={700}
+                onCurrentViewChange={(view) => {
+                    setCurrentView(view)
+                }}>
                 
                 <Editing
                     allowAdding={false}
