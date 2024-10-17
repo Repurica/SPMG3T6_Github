@@ -1,12 +1,19 @@
-.options {
-    padding: 5px;
-    padding-right: 15px;
-    background-color: rgba(191, 191, 191, 0.15);
-    margin-bottom: 0px;
-    text-align: right;
-  }
+.utility {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  padding-right: 15px;
+  padding-left: 15px;
+  background-color: rgba(191, 191, 191, 0.15);
+  margin-bottom: 0px;
+}
+
+.ppl_count {
+  font-size: small;
+  margin-bottom: 0px;
+}
   
-  .option {
-    margin-bottom: 0px;
-    display: inline-block;
-  }
+.option {
+  margin-bottom: 0px;
+  margin-left: auto;
+}
