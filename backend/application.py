@@ -236,30 +236,45 @@ def get_current_manpower(date, test_manager_id):
          return {"status": "valid"}, 200
    except Exception as e:
       return {"info": repr(e)}, 500
-@application.route("/get_all_requests_staff")  
+@application.route("/get_all_requests_staff", methods=['POST'])   
 def get_all_requests_staff():
-   test_staff_id = 140003
+   #test_staff_id = 140003
+   json_sent = request.get_json()
+   test_staff_id = json_sent['staff_id']
    try:
      
      application_response = supabase.table("application").select("*").eq("staff_id", test_staff_id).execute()
+     data = application_response.data
+     for item in data:
+         created_at_datetime = datetime.fromisoformat(item["created_at"])
+         item["created_at"] = created_at_datetime.strftime("%Y-%m-%d")
 
-     return application_response.data,200
+     for item in data:
+        starting_date = item["starting_date"]
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        condition = validate_date_range(starting_date, current_date)
+        item["validity_of_withdrawal"] = condition
+
+     return data,200
    except Exception as e:
-      return {"info": repr(e)}, 500
+      return {"info": repr(e),"traceback": traceback.format_exc()}, 500
 
 
-# @application.route("/specific_request")
-# def request_details():
-#    test_request_id = 1
-#    try:
-#       response_application = supabase.table("application").select("reason", "staff_id", "created_at", "starting_date", "end_date", "timing", "request_type").eq("application_id", test_request_id).execute()
-#       application_data = response_application.data
-#       staff_id = application_data[0]["staff_id"]
-#       employee_response = supabase.table("employee").select("staff_fname", "staff_lname").eq("staff_id", staff_id).execute()
-#       employee_data = employee_response.data
-#       returned_data = response_application.data
-#       returned_data[0]["employee_fullname"] = employee_data[0]["staff_fname"] + " " + employee_data[0]["staff_lname"]
+def validate_date_range(date1: str, date2: str) -> str:
+    # Convert strings to datetime objects
+    date_format = "%Y-%m-%d"
+    d1 = datetime.strptime(date1, date_format)
+    d2 = datetime.strptime(date2, date_format)
+    
+    # Calculate the date range boundaries (2 weeks forward and backward)
+    lower_bound = d1 - timedelta(weeks=2)
+    upper_bound = d1 + timedelta(weeks=2)
+    
+    # Check if date2 is within the range
+    if lower_bound <= d2 <= upper_bound:
+        return "valid"
+    else:
+        return "invalid"
 
-#       return returned_data, 200
-#    except Exception as e:
-#       return {"info": repr(e)}, 500
+# Test the function
+validate_date_range("2024-01-15", "2024-01-04")

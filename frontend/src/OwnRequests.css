@@ -124,3 +124,28 @@ button {
     cursor: pointer;    /* Pointer cursor on hover */
 }
 
+.button-container {
+    position: absolute; /* Position absolute to place it in the top right */
+    top: 10px;         /* Adjust top margin as needed */
+    right: 10px;       /* Adjust right margin as needed */
+}
+
+.withdraw-button {
+    margin-left: 5px; /* Space between buttons */
+    padding: 8px 12px; /* Adjust padding for button size */
+    background-color: blue; /* Green background for approve button */
+    color: white;      /* White text color */
+    border: none;      /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;    /* Pointer cursor on hover */
+}
+
+.withdraw-button:hover {
+    opacity: 0.8;      /* Slight transparency on hover */
+}
+
+.withdraw-button:disabled {
+    background-color: #ccc; /* Light grey */
+    cursor: not-allowed;
+
+  }

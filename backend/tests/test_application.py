@@ -51,7 +51,7 @@ def test_return_available_dates(mock_supabase, client):
     mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
         {"starting_date": "2023-01-01", "end_date": "2023-01-31", "timing": "AM"}
     ]
-    response = client.post('/available_dates', json={"staff_id": 1})
+    response = client.post('/available_dates', json={"staff_id": 140003})
     assert response.status_code == 200
     assert isinstance(response.json, dict)
     assert "results" in response.json
@@ -69,7 +69,7 @@ def test_return_available_dates_no_data(mock_supabase, client):
 def test_store_application_failure(mock_supabase, client):
     mock_supabase.from_.return_value.select.return_value.execute.return_value.count = 1
     mock_supabase.table.return_value.insert.return_value.execute.return_value.data = None
-    response = client.post('/store_application', json={"staff_id": 1, "starting_date": "2023-01-01", "end_date": "2023-01-31", "timing": "morning"})
+    response = client.post('/store_application', json={"staff_id": 1, "starting_date": "2023-01-01", "end_date": "2023-01-31", "timing": "AM"})
     assert response.status_code == 500
 
 @patch('backend.application.supabase')
@@ -144,7 +144,7 @@ def test_retrieve_pending_requests(mock_supabase, client):
    assert response.status_code == 200
    assert isinstance(response.json, dict)
 
-@patch('backend.application.supabase')
+
 def test_store_approval_rejection(mock_supabase, client):
     # Mocking the database calls
     mock_supabase.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
@@ -158,3 +158,7 @@ def test_store_approval_rejection(mock_supabase, client):
     # Check if the response status is 200
     assert response.status_code == 200
     assert response.json["update database"] == "success"
+
+
+
+    
