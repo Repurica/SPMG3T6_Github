@@ -39,13 +39,21 @@ function OwnRequests() {
 
     };
 
-    const WithdrawButton = ({app_status}) => {
-        if (app_status === 'pending' || app_status === 'approved'){
-            return ( //to disable / remove withdraw button if not valid
+    const WithdrawButton = ({app_status, valid}) => {
+        if ((app_status === 'pending' || app_status === 'approved') && valid){
+            return ( 
                 <div className="button-container">
                     <button onClick={handleWithdraw} className="withdraw-button">Withdraw</button>
                 </div>
             )
+        }
+        else if ((app_status === 'pending' || app_status === 'approved') && !valid){
+            return ( 
+                <div className="button-container">
+                    <button onClick={handleWithdraw} className="withdraw-button" disabled = {true}>Withdraw</button>
+                </div>
+            )
+
         }
     }
 
@@ -103,7 +111,7 @@ function OwnRequests() {
                     onClick={() => handleCardClick(key)}
                     onMouseEnter={() => handleCardHover(key, true)} 
                     onMouseLeave={() => handleCardHover(key, false)}>
-                        <WithdrawButton app_status={item.status}></WithdrawButton>
+                        <WithdrawButton app_status={item.status} valid = {item.validity_of_withdrawal}></WithdrawButton>
                         <p class="detail-text">
                             <span class="detail-label">Application Date:</span> {item.created_at} &nbsp;&nbsp;
                             {item.request_type === 'ad_hoc' ? (
