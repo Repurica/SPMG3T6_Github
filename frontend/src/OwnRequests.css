@@ -143,3 +143,9 @@ button {
 .withdraw-button:hover {
     opacity: 0.8;      /* Slight transparency on hover */
 }
+
+.withdraw-button:disabled {
+    background-color: #ccc; /* Light grey */
+    cursor: not-allowed;
+
+  }

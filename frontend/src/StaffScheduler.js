@@ -52,12 +52,14 @@ function StaffScheduler() {
 
     useEffect(() => {
       const currentDate = new Date();
+    //   const currentDate = new Date('2024-10-19'); // for testing
       currentDate.setMonth(currentDate.getMonth() - 2); 
       setStartDate(currentDate.toDateString()); 
     }, []);
 
     useEffect(() => {
         const currentDate = new Date();
+    //   const currentDate = new Date('2024-10-19'); // for testing
         currentDate.setMonth(currentDate.getMonth() + 3); 
         setEndDate(currentDate.toDateString()); 
       }, []);
