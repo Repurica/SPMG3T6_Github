@@ -53,8 +53,8 @@ def return_available_dates():
    results = []
    # Looping through 
    try:
-      data_recurring = supabase.table("application").select("starting_date", "end_date", "timing").eq("staff_id", staff_id).eq("request_type", "recurring").execute()
-      data_ad_hoc = supabase.table("application").select("starting_date", "timing").eq("staff_id", staff_id).eq("request_type", "ad_hoc").execute() 
+      data_recurring = supabase.table("application").select("starting_date", "end_date", "timing").eq("staff_id", staff_id).eq("request_type", "recurring").neq("status","rejected").execute()
+      data_ad_hoc = supabase.table("application").select("starting_date", "timing").eq("staff_id", staff_id).neq("status","rejected").eq("request_type", "ad_hoc").execute() 
       adhoc_results = data_ad_hoc.data   
       recurring_results = data_recurring.data
       results = []
