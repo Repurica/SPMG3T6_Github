@@ -40,14 +40,21 @@ function OwnRequests() {
     };
 
     const WithdrawButton = ({app_status, valid}) => {
-        if ((app_status === 'pending' || app_status === 'approved') && valid){
+        if ((app_status === 'pending')){
             return ( 
                 <div className="button-container">
                     <button onClick={handleWithdraw} className="withdraw-button">Withdraw</button>
                 </div>
             )
         }
-        else if ((app_status === 'pending' || app_status === 'approved') && !valid){
+        else if (app_status === 'approved' && valid){
+            return ( 
+                <div className="button-container">
+                    <button onClick={handleWithdraw} className="withdraw-button">Withdraw</button>
+                </div>
+            )
+        }
+        else if (app_status === 'approved' && !valid){
             return ( 
                 <div className="button-container">
                     <button onClick={handleWithdraw} className="withdraw-button" disabled = {true}>Withdraw</button>
