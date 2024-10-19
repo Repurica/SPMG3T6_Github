@@ -254,8 +254,11 @@ def get_all_requests_staff():
         current_date = datetime.now().strftime("%Y-%m-%d")
         condition = validate_date_range(starting_date, current_date)
         item["validity_of_withdrawal"] = condition
-
-     return data,200
+     sorted_data = sorted(data, key=lambda x: datetime.fromisoformat(x["created_at"]))
+     result_dict = {item["application_id"]: {key: value for key, value in item.items()} for item in data}
+     for item in result_dict.values():
+       item.pop("application_id", None)
+     return result_dict,200
    except Exception as e:
       return {"info": repr(e),"traceback": traceback.format_exc()}, 500
 
@@ -266,15 +269,13 @@ def validate_date_range(date1: str, date2: str) -> str:
     d1 = datetime.strptime(date1, date_format)
     d2 = datetime.strptime(date2, date_format)
     
-    # Calculate the date range boundaries (2 weeks forward and backward)
+   
     lower_bound = d1 - timedelta(weeks=2)
     upper_bound = d1 + timedelta(weeks=2)
     
-    # Check if date2 is within the range
+
     if lower_bound <= d2 <= upper_bound:
         return "valid"
     else:
         return "invalid"
 
-# Test the function
-validate_date_range("2024-01-15", "2024-01-04")
