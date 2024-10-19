@@ -17,3 +17,20 @@
   margin-bottom: 0px;
   margin-left: auto;
 }
+
+#scheduler .dx-scheduler-cell-sizes-horizontal {
+  width: 200px;
+}
+
+#scheduler .dx-scheduler-side-bar-scrollable-content {
+  margin-bottom: 0px;
+}
+
+#scheduler .dx-scheduler-cell-sizes-vertical {
+  height: 50px;
+}
+
+#scheduler .dx-scheduler-group-header {
+  height: 50px;
+  margin-bottom: 0px;
+}
