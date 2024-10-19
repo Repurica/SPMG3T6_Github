@@ -252,6 +252,12 @@ def get_all_requests_staff():
      for item in data:
         starting_date = item["starting_date"]
         current_date = datetime.now().strftime("%Y-%m-%d")
+        #test date 1 (check for after 2 weeks)
+        #current_date = "2024-10-18"
+      
+        #test date 2 (check for before 2 weeks)
+        #current_date = "2024-09-19"
+
         condition = validate_date_range(starting_date, current_date)
         item["validity_of_withdrawal"] = condition
      sorted_data = sorted(data, key=lambda x: datetime.fromisoformat(x["created_at"]))
@@ -278,4 +284,3 @@ def validate_date_range(date1: str, date2: str) -> str:
         return "valid"
     else:
         return "invalid"
-
