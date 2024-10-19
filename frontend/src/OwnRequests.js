@@ -47,14 +47,14 @@ function OwnRequests() {
                 </div>
             )
         }
-        else if (app_status === 'approved' && valid){
+        else if (app_status === 'approved' && (valid === 'valid')){
             return ( 
                 <div className="button-container">
                     <button onClick={handleWithdraw} className="withdraw-button">Withdraw</button>
                 </div>
             )
         }
-        else if (app_status === 'approved' && !valid){
+        else if (app_status === 'approved' && (valid === 'invalid')){
             return ( 
                 <div className="button-container">
                     <button onClick={handleWithdraw} className="withdraw-button" disabled = {true}>Withdraw</button>
