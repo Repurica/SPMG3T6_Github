@@ -13,7 +13,7 @@ def test_home_page(client):
     assert b'running!!' in response.data
 
 def test_all_employee(client):
-    response = client.get('/sample/all_employee ')
+    response = client.get('/sample/all_employee')
     assert response.status_code == 200
 
 
