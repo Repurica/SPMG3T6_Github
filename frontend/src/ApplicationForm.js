@@ -6,23 +6,25 @@ import './ApplicationForm.css'
 import { fetchWithRetry } from './FetchWithRetry';
 
 // Get date ranges of 2 months before and 3 months after
-const getDateRanges = () => {
-  const today = new Date();
-  const twoMonthsBefore = new Date();
+
+
+  let today = new Date();
+  let twoMonthsBefore = new Date();
+  let threeMonthsAfter = new Date();
+
+  // Test data for date ranges
+  // today = new Date('2024-10-6')
+  // twoMonthsBefore = new Date('2024-10-6');
+  // threeMonthsAfter = new Date('2024-10-6');
+
   twoMonthsBefore.setMonth(today.getMonth() - 2).toLocaleString("en-US", { timeZone: "Asia/Singapore" });
-  const threeMonthsAfter = new Date();
   threeMonthsAfter.setMonth(today.getMonth() + 3).toLocaleString("en-US", { timeZone: "Asia/Singapore" });
-  return {
-    formattedCurrentDate: today.toISOString().split('T')[0],
-    formattedTwoMonthsBefore: twoMonthsBefore.toISOString().split('T')[0],
-    formattedThreeMonthsAfter: threeMonthsAfter.toISOString().split('T')[0],
-  };
-};
+
+
 //TO DO: FETCH DATA FROM BACKEND AND SEND DATA TO BACKEND
 function ApplicationForm() {
   const [error, setError] = useState(null)
   const [data, setData] = useState([]);
-  const { formattedTwoMonthsBefore, formattedThreeMonthsAfter } = getDateRanges();
   const [selection, setSelection] = useState('ad_hoc');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -307,8 +309,8 @@ function ApplicationForm() {
               };
             }}
             filterDate={isWeekday}
-            minDate={formattedTwoMonthsBefore}
-            maxDate={formattedThreeMonthsAfter}
+            minDate={twoMonthsBefore}
+            maxDate={threeMonthsAfter}
             placeholderText="Select a start date"
             required
           />
@@ -328,7 +330,7 @@ function ApplicationForm() {
               } } // TODO: calc the recurring days of WFH and check if with the blocked dates, if have alert user and block out submit 
               filterDate={isWeekday}
               minDate={startDate} // end date must be >= start date
-              maxDate={formattedThreeMonthsAfter}
+              maxDate={threeMonthsAfter}
               placeholderText="Select an end date"
               required
             />

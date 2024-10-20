@@ -21,10 +21,13 @@ function ViewRequests() {
 
 
     const totalItems = Object.keys(data).length; // Total number of requests
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    let totalPages = Math.ceil(totalItems / itemsPerPage);
 
     
     const getCurrentItems = () => {
+        if (totalPages === 0){
+            totalPages = 1
+        }
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         return Object.entries(data).slice(startIndex, endIndex);
