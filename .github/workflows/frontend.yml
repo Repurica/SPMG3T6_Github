@@ -28,7 +28,6 @@ jobs:
           CI: true
         volumes:
           - ./frontend:/usr/src/app
-        command: bash -c "npm install && npm start"
 
     steps:
       - name: Checkout code
