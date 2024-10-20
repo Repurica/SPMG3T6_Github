@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 app = Flask(__name__)
+from supabase_init import supabase
 CORS(app)  # Enable CORS for the entire app
 
 # importing and registering the blueprint

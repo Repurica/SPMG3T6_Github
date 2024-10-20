@@ -1,0 +1,42 @@
+name: Cypress Tests
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./frontend
+
+      - name: Start React app
+        run: |
+          Start-Process -FilePath "npm" -ArgumentList "start" -NoNewWindow
+        env:
+          CI: true
+        working-directory: ./frontend
+
+      - name: Run Cypress tests
+        run: npm run cypress:run
+        working-directory: ./frontend
