@@ -1,3 +1,5 @@
+name: Cypress Tests
+
 on:
   push:
     branches: [ main, master ]
@@ -23,6 +25,9 @@ jobs:
       run: |
         npm ci
         npm install --save-dev @babel/plugin-proposal-private-property-in-object
+
+    - name: Lint
+      run: npm run lint -- --max-warnings 0
 
     - name: Build React App
       run: npm run build
@@ -51,16 +56,12 @@ jobs:
           exit 1
         fi
 
-    - name: Upload Cypress Screenshots
-      uses: actions/upload-artifact@v3
-      if: failure()
-      with:
-        name: cypress-screenshots
-        path: cypress/screenshots
 
-    - name: Upload Cypress Videos
+
+    - name: Upload Cypress Output Log
       uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: cypress-videos
-        path: frontend/cypress/videos
+        name: cypress-output
+        path: cypress-output.log
+
