@@ -215,9 +215,9 @@ def store_approval_rejection():
 
 
 def get_current_manpower(date, test_manager_id):
-   date_obj = datetime.strptime(date, "%Y-%m-%d")
-   day_of_week = date_obj.strftime("%A").lower()
    try:
+      date_obj = datetime.strptime(date, "%Y-%m-%d")
+      day_of_week = date_obj.strftime("%A").lower()
       response_employee = supabase.table("employee").select("staff_id", "staff_fname", "staff_lname").eq("reporting_manager", test_manager_id).execute()
       list_of_staff_ids = []
       
@@ -238,7 +238,7 @@ def get_current_manpower(date, test_manager_id):
       return {"info": repr(e)}, 500
 @application.route("/get_all_requests_staff", methods=['POST'])   
 def get_all_requests_staff():
-   #test_staff_id = 140003
+   #json is the form of {"staff_id": 140002}
    json_sent = request.get_json()
    test_staff_id = json_sent['staff_id']
    try:
