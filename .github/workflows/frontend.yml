@@ -1,31 +1,49 @@
 name: Cypress Tests
-on: [push]
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
 
 jobs:
-  install:
+  test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
+
+    services:
+      # Set up a local web server using the React development server
+      web:
+        image: node:14
+        ports:
+          - 3000:3000
+        options: --network-alias=web
+        env:
+          CI: true
+        volumes:
+          - ./:/usr/src/app
+        command: bash -c "npm install && npm start"
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
-          node-version: '18'
+          node-version: '14'
 
-      - name: Install Dependencies
-        run: |
-          npm ci
-          npm install --save-dev @babel/plugin-proposal-private-property-in-object
+      - name: Install dependencies
+        run: npm install
 
-      - name: Cypress run
-        uses: cypress-io/github-action@v3
-        with:
-          working-directory: frontend
-          browser: chrome
-          build: npm run build
-          start: npm start
-          wait-on: "http://localhost:3000"
+      - name: Start React app
+        run: npm start &
+        env:
+          CI: true
+
+      - name: Run Cypress tests
+        run: npm run cypress:run
