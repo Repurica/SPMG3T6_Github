@@ -33,20 +33,30 @@ jobs:
       run: npm start & npx wait-on http://localhost:3000
 
     - name: Run Cypress Tests
-      uses: cypress-io/github-action@v5
-      with:
-        working-directory: frontend
-        command: npm run cypress:run
-        wait-on: 'http://localhost:3000'
-        browser: chrome
-        headless: true
+      id: cypress
+      run: |
+        npm run cypress:run | tee cypress-output.log
+        exit ${PIPESTATUS[0]}
+
+    - name: Cypress Test Results
+      if: always()
+      run: |
+        echo "Cypress Test Output:"
+        cat cypress-output.log
+        
+        if [ ${{ steps.cypress.outcome }} == 'success' ]; then
+          echo "✅ Cypress tests passed successfully!"
+        else
+          echo "❌ Cypress tests failed. Check the test output above for more details."
+          exit 1
+        fi
 
     - name: Upload Cypress Screenshots
       uses: actions/upload-artifact@v3
       if: failure()
       with:
         name: cypress-screenshots
-        path: frontend/cypress/screenshots
+        path: cypress/screenshots
 
     - name: Upload Cypress Videos
       uses: actions/upload-artifact@v3
