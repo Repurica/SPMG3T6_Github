@@ -7,7 +7,7 @@ describe('The Home Page', () => {
 
 describe('The Application Form Page', () => {
   it('successfully loads', () => {
-    cy.visit('http://localhost:300/ApplicationForm')
+    cy.visit('http://localhost:3000/ApplicationForm')
   })
 })
 
