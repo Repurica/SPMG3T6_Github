@@ -38,6 +38,7 @@ jobs:
       run: npm start & npx wait-on http://localhost:3000
 
     - name: Run Cypress Tests
+      id: cypress
       uses: cypress-io/github-action@v5
       with:
         working-directory: frontend
@@ -45,6 +46,16 @@ jobs:
         wait-on: 'http://localhost:3000'
         browser: chrome
         headless: true
+
+    - name: Cypress Test Results
+      if: always()
+      run: |
+        if [ ${{ steps.cypress.outcome }} == 'success' ]; then
+          echo "Cypress tests passed successfully!"
+        else
+          echo "Cypress tests failed. Check the test output for more details."
+          exit 1
+        fi
 
     - name: Upload Cypress Screenshots
       uses: actions/upload-artifact@v3
@@ -59,4 +70,3 @@ jobs:
       with:
         name: cypress-videos
         path: frontend/cypress/videos
-
