@@ -18,8 +18,22 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Install Dependencies
+    - name: Check for package-lock.json
+      id: check-lock
+      run: |
+        if [ -f "package-lock.json" ]; then
+          echo "lock_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "lock_exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Install Dependencies (with package-lock.json)
+      if: steps.check-lock.outputs.lock_exists == 'true'
       run: npm ci
+
+    - name: Install Dependencies (without package-lock.json)
+      if: steps.check-lock.outputs.lock_exists == 'false'
+      run: npm install
 
     - name: Build React App
       run: npm run build
@@ -48,3 +62,4 @@ jobs:
       with:
         name: cypress-videos
         path: cypress/videos
+
