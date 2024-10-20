@@ -1,5 +1,4 @@
 name: Cypress Tests
-
 on: [push]
 
 jobs:
@@ -16,6 +15,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          cd frontend
           npm ci
           npm install --save-dev @babel/plugin-proposal-private-property-in-object
 
@@ -27,4 +27,3 @@ jobs:
           build: npm run build
           start: npm start
           wait-on: "http://localhost:3000"
-
