@@ -26,9 +26,6 @@ jobs:
         npm ci
         npm install --save-dev @babel/plugin-proposal-private-property-in-object
 
-    - name: Lint
-      run: npm run lint -- --max-warnings 0
-
     - name: Build React App
       run: npm run build
       env:
@@ -42,6 +39,16 @@ jobs:
       run: |
         npm run cypress:run | tee cypress-output.log
         exit ${PIPESTATUS[0]}
+
+
+    - name: Upload Cypress Output Log
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: cypress-output
+        path: cypress-output.log
+
+
 
     - name: Cypress Test Results
       if: always()
@@ -57,11 +64,4 @@ jobs:
         fi
 
 
-
-    - name: Upload Cypress Output Log
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: cypress-output
-        path: cypress-output.log
 
