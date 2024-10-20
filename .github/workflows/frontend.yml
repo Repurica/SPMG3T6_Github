@@ -15,19 +15,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-
-    services:
-      # Set up a local web server using the React development server
-      web:
-        image: node:14
-        ports:
-          - 3000:3000
-        options: --network-alias=web
-        env:
-          CI: true
-        volumes:
-          - ./frontend:/usr/src/app
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
@@ -43,7 +31,8 @@ jobs:
         working-directory: ./frontend
 
       - name: Start React app
-        run: npm start &
+        run: |
+          Start-Process -FilePath "npm" -ArgumentList "start" -NoNewWindow
         env:
           CI: true
         working-directory: ./frontend
