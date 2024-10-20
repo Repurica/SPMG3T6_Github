@@ -5,12 +5,13 @@ on:
       - main
     paths:
       - 'frontend/**'
+      - '.github/workflows/frontend.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'frontend/**'
-  workflow_dispatch:
+      - '.github/workflows/frontend.yml'
 
 jobs:
   test:
@@ -26,7 +27,7 @@ jobs:
         env:
           CI: true
         volumes:
-          - ./:/usr/src/app
+          - ./frontend:/usr/src/app
         command: bash -c "npm install && npm start"
 
     steps:
@@ -40,11 +41,14 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./frontend
 
       - name: Start React app
         run: npm start &
         env:
           CI: true
+        working-directory: ./frontend
 
       - name: Run Cypress tests
         run: npm run cypress:run
+        working-directory: ./frontend
