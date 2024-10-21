@@ -9,21 +9,41 @@ function OwnRequests() {
     const [error, setError] = useState(null)
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState("all");
 
-
-    const staff_id = 140002
+    // 140002 for view testing
+    //140004
+    const staff_id = 140004
 
     const itemsPerPage = 3;
 
 
-    const totalItems = Object.keys(data).length; // Total number of requests
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    let totalItems = Object.keys(data).length; // Total number of requests
+    let totalPages = Math.ceil(totalItems / itemsPerPage);
 
     
+    const getFilteredData = () => {
+        if (filter === "all") {
+            totalItems = Object.keys(data).length
+            totalPages = Math.ceil(totalItems / itemsPerPage);
+            return data;
+        }
+        let filterItems =  Object.fromEntries(
+            Object.entries(data).filter(([key, item]) => item.status === filter)
+        );
+        totalItems = Object.keys(filterItems).length
+        totalPages = Math.ceil(totalItems / itemsPerPage);
+        return filterItems
+    };
+
     const getCurrentItems = () => {
+        const filteredData = getFilteredData();
+        if (totalPages === 0){
+            totalPages = 1
+        }
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        return Object.entries(data).slice(startIndex, endIndex);
+        return Object.entries(filteredData).slice(startIndex, endIndex);
     };
 
     const currentItems = getCurrentItems();
@@ -83,6 +103,7 @@ function OwnRequests() {
 
                 const result = await response.json();
                 setData(result);
+                console.log(result)
                 setError(null); // Clear any previous errors
             } catch (err) {
                 console.log(err.message);
@@ -111,6 +132,23 @@ function OwnRequests() {
                     <FaInbox className="inbox-icon" />
                     <span className="request-count">{totalItems}</span>
                 </div>
+            </div>
+            {/* Filter Section */}
+            <div className="filter-section">
+                <label htmlFor="status-filter">Filter by status:</label>
+                <select
+                    id="status-filter"
+                    value={filter}
+                    onChange={(e) => {
+                        setFilter(e.target.value);
+                        setCurrentPage(1); // Reset to first page on filter change
+                    }}
+                >
+                    <option value="all">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
             </div>
             <div>
                 {currentItems.map(([key, item]) => (
