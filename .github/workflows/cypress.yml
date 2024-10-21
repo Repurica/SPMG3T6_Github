@@ -37,9 +37,9 @@ jobs:
     - name: Cypress run
       uses: cypress-io/github-action@v5
       with:
-      working-directory: frontend
-      build: |
-        export DISABLE_ESLINT_PLUGIN=true
-        npm run build
-      start: npm start
-      wait-on: 'http://localhost:3000'
+        working-directory: frontend
+        build: |
+          export DISABLE_ESLINT_PLUGIN=true
+          npm run build
+        start: npm start
+        wait-on: 'http://localhost:3000'
