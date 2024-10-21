@@ -24,7 +24,7 @@ def mock_supabase(mocker):
 
 
 @patch('backend.application.supabase')
-def test_store_approval_rejection_rejected(mock_supabase, client):
+def test_store_approval_rejection_exception(mock_supabase, client):
     mock_supabase.table.return_value.update.return_value.eq.return_value.execute.side_effect = Exception("error")
     response = client.post('/store_approval_rejection', json={"id": None, "outcome": "rejected", "outcome_reason": "testr"})
     assert response.status_code == 500

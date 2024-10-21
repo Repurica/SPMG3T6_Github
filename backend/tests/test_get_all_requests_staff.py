@@ -78,7 +78,7 @@ def test_get_all_requests_staff_valid(client, mock_supabase, mock_validate_date_
 
 # Negative Path - No applications found for the staff
 def test_get_all_requests_staff_no_applications(client, mock_supabase, mock_validate_date_range):
-    test_staff_id = 999999
+    test_staff_id = 180037
     request_data = {"staff_id": test_staff_id}
     
     # Mock empty response from Supabase

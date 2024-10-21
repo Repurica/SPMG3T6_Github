@@ -96,7 +96,7 @@ def store_application():
 @application.route('/retrieve_pending_requests', methods=['POST'])
 def retrieve_pending_requests():
    json_sent = request.get_json()
-   print(json_sent["manager_id"])
+   # print(json_sent["manager_id"])
    try:
       response_employee = supabase.table("employee").select("staff_id", "staff_fname", "staff_lname").eq("reporting_manager", json_sent["manager_id"]).execute()
       list_of_staff_ids = []
@@ -116,20 +116,56 @@ def retrieve_pending_requests():
          starting_date = record["starting_date"]
          end_date = record["end_date"]
          request_type = record["request_type"]
+         timing = record["timing"]
+         
+         # print(request_type,timing)
          if request_type == "recurring":
-            dates_between = get_matching_weekday_dates(starting_date, end_date)
-            for date in dates_between:
-               print(date)
-               response = get_current_manpower(date, json_sent["manager_id"])
-               if response[0]["status"] == "invalid":
-                  record["capacity"] = "invalid"
-                  break
+            dates_between = get_matching_weekday_dates(starting_date, end_date) # eg. [2024-10-08, 2024-10-15, 2024-10-22]
+            if timing == "AM":
+               for date in dates_between:
+                 response = get_current_manpower_AM(date, json_sent["manager_id"])
+                 if response[0]["status_AM"] == "invalid":
+                   record["capacity"] = "invalid"
+                   break
+                 
                record["capacity"] = "valid"
-         else:
-            response = get_current_manpower(starting_date, json_sent["manager_id"])
-            print(response)
-            status = response[0]["status"]
-            record["capacity"] = status
+            
+            elif timing == "PM":
+               for date in dates_between:
+                 response= get_current_manpower_PM(date, json_sent["manager_id"])
+                 if response[0]["status_PM"] == "invalid":
+                   record["capacity"] = "invalid"
+                   break
+               record["capacity"] = "valid"
+            else:
+               for date in dates_between:
+                 response= get_current_manpower_whole_day(date, json_sent["manager_id"])
+                 if response[0]["status_whole_day"] == "invalid":
+                   record["capacity"] = "invalid"
+                   break
+               record["capacity"] = "valid"
+
+         elif request_type == "ad_hoc":
+            if timing == "AM":
+                 response= get_current_manpower_AM(starting_date, json_sent["manager_id"])
+                 print(response)
+                 if response[0]["status_AM"] == "invalid":
+                   record["capacity"] = "invalid"
+                 else:
+                   record["capacity"] = "valid"
+            
+            elif timing == "PM":
+                 response= get_current_manpower_PM(starting_date, json_sent["manager_id"])
+                 if response[0]["status_PM"] == "invalid":
+                   record["capacity"] = "invalid"
+                 else:
+                   record["capacity"] = "valid"
+            else:
+                 response = get_current_manpower_whole_day(starting_date, json_sent["manager_id"])
+                 if response[0]["status_whole_day"] == "invalid":
+                   record["capacity"] = "invalid"
+                 else:
+                   record["capacity"] = "valid"
 
       sorted_data = sorted(returned_result, key=lambda x: datetime.fromisoformat(x["created_at"]))
       for item in sorted_data:
@@ -214,28 +250,101 @@ def store_approval_rejection():
 
 
 
-def get_current_manpower(date, test_manager_id):
+def get_current_manpower_AM(date, test_manager_id):
+
    try:
       date_obj = datetime.strptime(date, "%Y-%m-%d")
       day_of_week = date_obj.strftime("%A").lower()
       response_employee = supabase.table("employee").select("staff_id", "staff_fname", "staff_lname").eq("reporting_manager", test_manager_id).execute()
       list_of_staff_ids = []
-      
       for staff_id_dict in response_employee.data:
          list_of_staff_ids.append(staff_id_dict["staff_id"])
-      print(list_of_staff_ids)
-      schedule_response = supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "in_office").in_("staff_id", list_of_staff_ids).execute()
-      count_in_office = len(schedule_response.data) - 1
-      max_capacity_response = supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).in_("staff_id", list_of_staff_ids).execute()
-      max_capacity = len(max_capacity_response.data)
-      percentage_capacity = count_in_office / max_capacity * 100
-      formatted_capacity = round(percentage_capacity, 2)  
-      if formatted_capacity < 50:
-         return {"status": "invalid"}, 200
-      else:
-         return {"status": "valid"}, 200
+      # print(list_of_staff_ids)
+      am_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "AM").in_("staff_id", list_of_staff_ids).execute().data)
+      # pm_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "PM").in_("staff_id", list_of_staff_ids).execute().data)
+      full_day_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "full_day").in_("staff_id", list_of_staff_ids).execute().data)
+      max_capacity = len(list_of_staff_ids)
+      percentage_capacity = (am_counter + full_day_counter+1)/max_capacity
+      print(percentage_capacity)
+      if percentage_capacity >= 0.5:
+         return {"status_AM": "invalid"}, 200
+      return {"status_AM": "valid"}, 200
+   
+     
+   except Exception as e:
+        return {"info": repr(e)}, 500
+   
+
+def get_current_manpower_PM(date, test_manager_id):
+   try:
+      date_obj = datetime.strptime(date, "%Y-%m-%d")
+      day_of_week = date_obj.strftime("%A").lower()
+      response_employee = supabase.table("employee").select("staff_id", "staff_fname", "staff_lname").eq("reporting_manager", test_manager_id).execute()
+      list_of_staff_ids = []
+      for staff_id_dict in response_employee.data:
+         list_of_staff_ids.append(staff_id_dict["staff_id"])
+      # print(list_of_staff_ids)
+      # am_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "AM").in_("staff_id", list_of_staff_ids).execute().data)
+      pm_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "PM").in_("staff_id", list_of_staff_ids).execute().data)
+      full_day_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "full_day").in_("staff_id", list_of_staff_ids).execute().data)
+      max_capacity = len(list_of_staff_ids)
+      percentage_capacity = (pm_counter + full_day_counter+1)/max_capacity
+      if percentage_capacity >= 0.5:
+         return {"status_PM": "invalid"}, 200
+      return {"status_PM": "valid"}, 200
+   
+     
+   except Exception as e:
+        return {"info": repr(e)}, 500
+#create AM counter and PM counter
+# for each am add +1 to am, pm also same then full day add +1 to both (how many ppl not in office)
+@application.route("/get_current_manpower", methods=['POST'])
+def current_manpower_new():
+   try:
+      json_sent = request.get_json()
+      test_manager_id = json_sent["manager_id"]
+      date = json_sent["date"]
+      date_obj = datetime.strptime(date, "%Y-%m-%d")
+      day_of_week = date_obj.strftime("%A").lower()
+      response_employee = supabase.table("employee").select("staff_id", "staff_fname", "staff_lname").eq("reporting_manager", test_manager_id).execute()
+      list_of_staff_ids = []
+      for staff_id_dict in response_employee.data:
+         list_of_staff_ids.append(staff_id_dict["staff_id"])
+      # print(list_of_staff_ids)
+      am_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "AM").in_("staff_id", list_of_staff_ids).execute().data)
+      pm_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "PM").in_("staff_id", list_of_staff_ids).execute().data)
+      full_day_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "full_day").in_("staff_id", list_of_staff_ids).execute().data)
+      max_capacity = len(list_of_staff_ids)
+      percentage_capacity = (am_counter + full_day_counter)/max_capacity
+      return {"result" : max_capacity,"am":am_counter,"pm":pm_counter,"full_day":full_day_counter,"percentage_capacity":percentage_capacity}
+     
    except Exception as e:
       return {"info": repr(e)}, 500
+
+def get_current_manpower_whole_day(date, test_manager_id):
+   try:
+      
+      date_obj = datetime.strptime(date, "%Y-%m-%d")
+      day_of_week = date_obj.strftime("%A").lower()
+      response_employee = supabase.table("employee").select("staff_id", "staff_fname", "staff_lname").eq("reporting_manager", test_manager_id).execute()
+      list_of_staff_ids = []
+      for staff_id_dict in response_employee.data:
+         list_of_staff_ids.append(staff_id_dict["staff_id"])
+      # print(list_of_staff_ids)
+      # am_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "AM").in_("staff_id", list_of_staff_ids).execute().data)
+      # pm_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "PM").in_("staff_id", list_of_staff_ids).execute().data)
+      counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).neq(day_of_week, "in_office").in_("staff_id", list_of_staff_ids).execute().data)
+      max_capacity = len(list_of_staff_ids)
+      percentage_capacity = (counter+1)/max_capacity
+      if percentage_capacity >= 0.5:
+         return {"status_whole_day": "invalid"}, 200
+      return {"status_whole_day": "valid"}, 200
+   
+     
+   except Exception as e:
+        return {"info": repr(e)}, 500
+   
+
 @application.route("/get_all_requests_staff", methods=['POST'])   
 def get_all_requests_staff():
    #json is the form of {"staff_id": 140002}
