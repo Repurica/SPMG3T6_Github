@@ -4,7 +4,7 @@ from flask import Flask
 import sys
 
 # adding Folder_2 to the system path
-sys.path.insert(0, 'C:\wamp64\www\SPMG3T6_Github\\backend')
+# sys.path.insert(0, 'C:\wamp64\www\SPMG3T6_Github\\backend')
 from application import application, get_current_manpower
 from datetime import datetime
 

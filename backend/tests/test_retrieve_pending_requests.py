@@ -4,8 +4,9 @@ from flask import Flask
 import sys
 
 # adding Folder_2 to the system path
-sys.path.insert(0, 'C:\wamp64\www\SPMG3T6_Github\\backend')
-from application import application, get_dates_on_same_weekday, get_matching_weekday_dates
+# sys.path.insert(0, 'C:\wamp64\www\SPMG3T6_Github\\backend')
+# from application import application, get_dates_on_same_weekday, get_matching_weekday_dates
+from application import application
 from datetime import datetime
 
 # Setup test client
