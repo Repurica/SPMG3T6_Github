@@ -1,14 +1,15 @@
 name: Cypress Tests
-push:
-  branches: [main]
-  paths:
-    - "frontend/**"
-    - ".github/workflows/cypress.yml"
-pull_request:
-  branches: [main]
-  paths:
-    - "frontend/**"
-    - ".github/workflows/cypress.yml"
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/cypress.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/cypress.yml"
 
 jobs:
   cypress-run:
