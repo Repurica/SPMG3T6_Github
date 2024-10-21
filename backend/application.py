@@ -236,6 +236,8 @@ def get_current_manpower(date, test_manager_id):
          return {"status": "valid"}, 200
    except Exception as e:
       return {"info": repr(e)}, 500
+   
+   
 @application.route("/get_all_requests_staff", methods=['POST'])   
 def get_all_requests_staff():
    #json is the form of {"staff_id": 140002}
@@ -243,13 +245,19 @@ def get_all_requests_staff():
    test_staff_id = json_sent['staff_id']
    try:
      
-     application_response = supabase.table("application").select("*").eq("staff_id", test_staff_id).execute()
-     data = application_response.data
-     for item in data:
-         created_at_datetime = datetime.fromisoformat(item["created_at"])
-         item["created_at"] = created_at_datetime.strftime("%Y-%m-%d")
+      application_response = supabase.table("application").select("*").eq("staff_id", test_staff_id).execute()
+      data = application_response.data
+      
+      
+      for item in data:
+         created_at_datetime = datetime.fromisoformat(".".join(item["created_at"].split(".")[:-1]))
+         
+         # created_at_datetime = datetime.fromisoformat(item["created_at"])
 
-     for item in data:
+         item["created_at"] = created_at_datetime.strftime("%Y-%m-%d")
+         
+   
+      for item in data:
         starting_date = item["starting_date"]
         current_date = datetime.now().strftime("%Y-%m-%d")
         #test date 1 (check for after 2 weeks)
@@ -260,11 +268,11 @@ def get_all_requests_staff():
 
         condition = validate_date_range(starting_date, current_date)
         item["validity_of_withdrawal"] = condition
-     sorted_data = sorted(data, key=lambda x: datetime.fromisoformat(x["created_at"]))
-     result_dict = {item["application_id"]: {key: value for key, value in item.items()} for item in data}
-     for item in result_dict.values():
-       item.pop("application_id", None)
-     return result_dict,200
+      sorted_data = sorted(data, key=lambda x: datetime.fromisoformat(x["created_at"]))
+      result_dict = {item["application_id"]: {key: value for key, value in item.items()} for item in data}
+      for item in result_dict.values():
+         item.pop("application_id", None)
+      return result_dict,200
    except Exception as e:
       return {"info": repr(e),"traceback": traceback.format_exc()}, 500
 
