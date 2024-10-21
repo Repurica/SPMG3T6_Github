@@ -29,16 +29,14 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    # - name: Build React app
-    #   run: |
-    #     export DISABLE_ESLINT_PLUGIN=true
-    #     npm run build
+    - name: Build React app
+      run: |
+        export DISABLE_ESLINT_PLUGIN=true
+        npm run build
 
     - name: Cypress run
       uses: cypress-io/github-action@v5
       with:
         working-directory: frontend
-        pre-build: npm ci
-        build: npm run build
         start: npm start
         wait-on: 'http://localhost:3000'
