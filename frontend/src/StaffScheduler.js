@@ -7,7 +7,6 @@ import { fetchWithRetry } from './FetchWithRetry';
 import RadioGroup from 'devextreme-react/radio-group';
 
 function StaffScheduler() {
-    const [error, setError] = useState(null)
     const [ownSchedule, setOwnSchedule] = useState([]);  
     const [teamSchedule, setTeamSchedule] = useState([]);  
     const [staffData, setStaffData] = useState([]);
@@ -41,12 +40,9 @@ function StaffScheduler() {
                 setTeamSchedule(teamData.schedules);  
                 setStaffData(teamData.staff_data);  
                 // console.log(staffData)
-                // console.log(teamSchedule)
-
-                setError(null);
+                console.log(teamSchedule)
             } catch (error) {
                 console.log(error.message);
-                setError(error.message);  // Display error message
             }
         };
         fetchSchedules();
