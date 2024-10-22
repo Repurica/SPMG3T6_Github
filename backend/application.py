@@ -23,6 +23,8 @@ def get_dates_on_same_weekday(start_date_str, end_date_str):
 
    return same_day_dates
 
+
+
 def get_matching_weekday_dates(start_date, end_date):
    # Convert the input strings to datetime objects
    start_date = datetime.strptime(start_date, "%Y-%m-%d")
@@ -43,6 +45,9 @@ def get_matching_weekday_dates(start_date, end_date):
    
    return matching_dates
 
+
+
+
 @application.route('/available_dates', methods=['POST'])
 # Function that returns all dates at which requests have already been made
 def return_available_dates():
@@ -53,45 +58,53 @@ def return_available_dates():
    results = []
    # Looping through 
    try:
-      data_recurring = supabase.table("application").select("starting_date", "end_date", "timing").eq("staff_id", staff_id).eq("request_type", "recurring").neq("status","rejected").execute()
-      data_ad_hoc = supabase.table("application").select("starting_date", "timing").eq("staff_id", staff_id).neq("status","rejected").eq("request_type", "ad_hoc").execute() 
-      adhoc_results = data_ad_hoc.data   
-      recurring_results = data_recurring.data
-      results = []
-      for result in recurring_results:
-         start_date = result["starting_date"]
-         end_date = result["end_date"]
-         wfh_timing = result["timing"]
-         dates_list = get_dates_on_same_weekday(start_date, end_date)
-         print(dates_list)
-         for date in dates_list:
-            results.append({"date": date.strftime("%Y-%m-%d"),
-                        "wfh_timing": wfh_timing})
-      # print(results)
-      for result2 in adhoc_results:
-         start_date = result2["starting_date"]
-         wfh_timing_adhoc = result2["timing"]
-         results.append({"date": start_date, "wfh_timing": wfh_timing_adhoc})
+      data_returned= supabase.table("application").select("timing","applied_dates","request_type").eq("staff_id", staff_id).neq("status","rejected").execute().data
+      for record in data_returned:
+         applied_dates = record["applied_dates"]["dates"]
+         for date in applied_dates:
+            results.append({"date": date, "wfh_timing": record["timing"]})
+
       return {"results": results}, 200
    except Exception as e:
       return {"results": results,
             "info": repr(e)}, 500
+
+
+
+
 
 @application.route('/store_application', methods=['POST'])
 def store_application():
    json_sent = request.get_json()
 
    try:
+      # toSend = { 
+      #     "request_type" : selection,
+      #     "starting_date" : startDate.toLocaleDateString("en-CA"), // yyyy-mm-dd format
+      #     "end_date" : endDate.toLocaleDateString("en-CA"),
+      #     "reason" : reason,
+      #     "timing" : timing,
+      #     "staff_id" : staffId,
+      #  } 
       count_records = supabase.table("application").select("*", count="exact").execute()
       json_sent["application_id"] = count_records.count + 1
       json_sent["status"] = "pending"
+      if json_sent["request_type"] == "recurring":
+         json_sent["applied_dates"] = {"dates": get_matching_weekday_dates(json_sent["starting_date"], json_sent["end_date"])}
+      elif json_sent["request_type"] == "ad_hoc":
+         json_sent["applied_dates"] = {"dates": [json_sent["starting_date"]]}
+      
       response = supabase.table("application").insert(json_sent).execute()
-      if response and response.data:
-         return {"count": count_records.count, "status": "success"}, 200
-      else:
-         return {"status": "error", "message": "could not insert into database"}, 404
+      # if response and response.data:
+      return {"count": count_records.count, "status": "success"}, 200
+      # else:
+      #    return {"status": "error", "message": "could not insert into database"}, 404
    except Exception as e:
       return {"info": repr(e)}, 500
+
+
+
+
 
 @application.route('/retrieve_pending_requests', methods=['POST'])
 def retrieve_pending_requests():
@@ -296,30 +309,12 @@ def get_current_manpower_PM(date, test_manager_id):
      
    except Exception as e:
         return {"info": repr(e)}, 500
+   
+
+
+
 #create AM counter and PM counter
 # for each am add +1 to am, pm also same then full day add +1 to both (how many ppl not in office)
-@application.route("/get_current_manpower", methods=['POST'])
-def current_manpower_new():
-   try:
-      json_sent = request.get_json()
-      test_manager_id = json_sent["manager_id"]
-      date = json_sent["date"]
-      date_obj = datetime.strptime(date, "%Y-%m-%d")
-      day_of_week = date_obj.strftime("%A").lower()
-      response_employee = supabase.table("employee").select("staff_id", "staff_fname", "staff_lname").eq("reporting_manager", test_manager_id).execute()
-      list_of_staff_ids = []
-      for staff_id_dict in response_employee.data:
-         list_of_staff_ids.append(staff_id_dict["staff_id"])
-      # print(list_of_staff_ids)
-      am_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "AM").in_("staff_id", list_of_staff_ids).execute().data)
-      pm_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "PM").in_("staff_id", list_of_staff_ids).execute().data)
-      full_day_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "full_day").in_("staff_id", list_of_staff_ids).execute().data)
-      max_capacity = len(list_of_staff_ids)
-      percentage_capacity = (am_counter + full_day_counter)/max_capacity
-      return {"result" : max_capacity,"am":am_counter,"pm":pm_counter,"full_day":full_day_counter,"percentage_capacity":percentage_capacity}
-     
-   except Exception as e:
-      return {"info": repr(e)}, 500
 
 def get_current_manpower_whole_day(date, test_manager_id):
    try:
@@ -330,9 +325,7 @@ def get_current_manpower_whole_day(date, test_manager_id):
       list_of_staff_ids = []
       for staff_id_dict in response_employee.data:
          list_of_staff_ids.append(staff_id_dict["staff_id"])
-      # print(list_of_staff_ids)
-      # am_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "AM").in_("staff_id", list_of_staff_ids).execute().data)
-      # pm_counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).eq(day_of_week, "PM").in_("staff_id", list_of_staff_ids).execute().data)
+
       counter = len(supabase.table("schedule").select('*').lte('starting_date', date).gte("end_date", date).neq(day_of_week, "in_office").in_("staff_id", list_of_staff_ids).execute().data)
       max_capacity = len(list_of_staff_ids)
       percentage_capacity = (counter+1)/max_capacity
@@ -401,3 +394,9 @@ def validate_date_range(date1: str, date2: str) -> str:
         return "valid"
     else:
         return "invalid"
+    
+
+
+
+
+   

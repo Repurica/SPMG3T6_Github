@@ -17,6 +17,9 @@ app.register_blueprint(schedule, url_prefix="/schedule")
 from application import application
 app.register_blueprint(application, url_prefix="/application")
 
+from withdrawals import withdrawals
+app.register_blueprint(withdrawals, url_prefix="/withdrawals")
+
 @app.route('/')
 def home():
     return "running!!"
