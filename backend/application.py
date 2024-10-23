@@ -2,7 +2,7 @@ from flask import request, Blueprint
 from supabase_init import supabase
 import traceback
 from datetime import datetime, timedelta, date
-
+import logging
 application = Blueprint('application', __name__)
 
 # Helper function to get_dates_between_2_dates
@@ -52,7 +52,7 @@ def get_matching_weekday_dates(start_date, end_date):
 # Function that returns all dates at which requests have already been made
 def return_available_dates():
    json_sent = request.get_json()
-   # staff id comes in from front-end, so staff_id is hardcoded for now
+   # json_sent should be in the form of {"staff_id": 140002}
    staff_id = json_sent["staff_id"]
    # extract from supabase the dates where the staff is WFH
    results = []
@@ -338,45 +338,49 @@ def get_current_manpower_whole_day(date, test_manager_id):
         return {"info": repr(e)}, 500
    
 
-   
-   
-@application.route("/get_all_requests_staff", methods=['POST'])   
+
+
+@application.route("/get_all_requests_staff", methods=['POST'])
 def get_all_requests_staff():
-   #json is the form of {"staff_id": 140002}
-   json_sent = request.get_json()
-   test_staff_id = json_sent['staff_id']
-   try:
-     
-      application_response = supabase.table("application").select("*").eq("staff_id", test_staff_id).execute()
-      data = application_response.data
-      
-      
-      for item in data:
-         created_at_datetime = datetime.fromisoformat(".".join(item["created_at"].split(".")[:-1]))
-         
-         # created_at_datetime = datetime.fromisoformat(item["created_at"])
+    # json is in the form of {"staff_id": 140002}
+    json_sent = request.get_json()
+    test_staff_id = json_sent['staff_id']
+    try:
+        application_response = supabase.table("application").select("*").eq("staff_id", test_staff_id).execute()
+        data = application_response.data
 
-         item["created_at"] = created_at_datetime.strftime("%Y-%m-%d")
-         
-   
-      for item in data:
-        starting_date = item["starting_date"]
-        current_date = datetime.now().strftime("%Y-%m-%d")
-        #test date 1 (check for after 2 weeks)
-        #current_date = "2024-10-18"
-      
-        #test date 2 (check for before 2 weeks)
-        #current_date = "2024-09-19"
+        for item in data:
+            try:
+                try:
+                    created_at_datetime = datetime.strptime(item["created_at"], "%Y-%m-%d %H:%M:%S.%f")
+                except ValueError:
+                    created_at_datetime = datetime.fromisoformat(item["created_at"])
+                item["created_at"] = created_at_datetime.strftime("%Y-%m-%d")
+            except Exception as e:
+                item["created_at"] = "Invalid date"
+                logging.error(f"Error parsing created_at for item {item}: {e}")
 
-        condition = validate_date_range(starting_date, current_date)
-        item["validity_of_withdrawal"] = condition
-      sorted_data = sorted(data, key=lambda x: datetime.fromisoformat(x["created_at"]))
-      result_dict = {item["application_id"]: {key: value for key, value in item.items()} for item in data}
-      for item in result_dict.values():
-         item.pop("application_id", None)
-      return result_dict,200
-   except Exception as e:
-      return {"info": repr(e),"traceback": traceback.format_exc()}, 500
+        for item in data:
+            try:
+                starting_date = item["starting_date"]
+                current_date = datetime.now().strftime("%Y-%m-%d")
+                condition = validate_date_range(starting_date, current_date)
+                item["validity_of_withdrawal"] = condition
+            except Exception as e:
+                item["validity_of_withdrawal"] = "Error"
+                logging.error(f"Error validating date range for item {item}: {e}")
+
+        sorted_data = sorted(data, key=lambda x: datetime.strptime(x["created_at"], "%Y-%m-%d") if x["created_at"] != "Invalid date" else datetime.min)
+        result_dict = {item["application_id"]: {key: value for key, value in item.items()} for item in sorted_data}
+        for item in result_dict.values():
+            item.pop("application_id", None)
+
+        return result_dict, 200
+    except Exception as e:
+        logging.error(f"Error in get_all_requests_staff: {e}")
+        return {"info": repr(e), "traceback": traceback.format_exc()}, 500
+
+
 
 
 def validate_date_range(date1: str, date2: str) -> str:

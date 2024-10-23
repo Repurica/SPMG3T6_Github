@@ -1,11 +1,11 @@
-from flask import request, Blueprint
+from flask import request, Blueprint, jsonify
 from supabase_init import supabase
 import traceback
 from datetime import datetime, timedelta, date
 
 withdrawals = Blueprint('withdrawals', __name__)
 
-@withdrawals.route("/store_withdrawal", methods=['POST'])
+@withdrawals.route("/store_withdrawal", methods=['POST']) #tested and is working (using postman)
 def staff_store_withdrawal():
    json_sent = request.get_json()
    # json_sent = {
@@ -35,7 +35,7 @@ def staff_store_withdrawal():
       return {"status": "error", "message": str(e)},500
 
 
-@withdrawals.route("/retrieve_withdrawals", methods=['POST'])
+@withdrawals.route("/retrieve_withdrawals", methods=['POST']) #tested and is working (using postman)
 def manager_view_withdrawals():
    # a manager id is sent in the json
    json_sent = request.get_json()
@@ -51,8 +51,8 @@ def manager_view_withdrawals():
          dict_staff_ids_names[staff_id_dict["staff_id"]] = staff_id_dict["staff_fname"] + " " + staff_id_dict["staff_lname"]
          
       returned_result = supabase.table("withdrawals").select("withdrawal_id","application_id", "reason","withdrawn_dates").in_("staff_id", list_of_staff_ids).eq("withdrawal_status", "pending").execute().data
-
-      return returned_result
+    
+      return jsonify(returned_result), 200
 
    except Exception as e:
         traceback.print_exc()
@@ -71,12 +71,18 @@ def store_outcome_withdrawal_manager():
       #update the status of the withdrawal request to approved
       response = supabase.table("withdrawals").update({"status": "approved","outcome_reason":json_sent["outcome_reason"]}).eq("withdrawal_id", json_sent["withdrawal_id"]).execute()
       #get the application id of the withdrawal request
+
       withdrawal_details = supabase.table("withdrawals").select("staff_id","application_id","applied_dates").eq("withdrawal_id", json_sent["withdrawal_id"]).execute().data
+
       application_id = withdrawal_details[0]["application_id"]
+
       applied_dates = withdrawal_details[0]["applied_dates"]["dates"]
       staff_id = withdrawal_details[0]["staff_id"]
+
       #select withdrawn dates of the withdrawal request
       withdrawn_dates = supabase.table("withdrawals").select("withdrawn_dates").eq("withdrawal_id", json_sent["withdrawal_id"]).execute().data[0]["withdrawn_dates"]
+
+
       #update application dates in application table
       for date in withdrawn_dates:
          if date in applied_dates:
