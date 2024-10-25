@@ -1,0 +1,7 @@
+﻿schedule_id,staff_id,starting_date,end_date,monday,tuesday,wednesday,thursday,friday,saturday,sunday
+130,180012,2024-10-07,2024-10-11,in_office,PM,in_office,in_office,in_office,,
+131,180029,2024-10-07,2024-10-11,in_office,PM,in_office,in_office,in_office,,
+132,180012,2024-10-14,2024-10-18,in_office,PM,in_office,in_office,in_office,,
+133,180029,2024-10-14,2024-10-18,in_office,PM,in_office,in_office,in_office,,
+134,180012,2024-10-21,2024-10-25,in_office,PM,in_office,in_office,in_office,,
+135,180029,2024-10-21,2024-10-25,in_office,PM,in_office,in_office,in_office,,
