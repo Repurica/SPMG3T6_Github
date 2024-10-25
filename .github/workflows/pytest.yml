@@ -1,5 +1,4 @@
 name: Python Tests
-
 on:
   push:
     branches: [ main ]
@@ -26,6 +25,12 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
+
+    - name: Create .env file
+      run: |
+        echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> backend/.env
+        echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> backend/.env
+ 
 
     - name: Install dependencies
       run: |
