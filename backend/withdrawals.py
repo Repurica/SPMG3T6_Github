@@ -62,7 +62,7 @@ def manager_view_withdrawals():
 def store_outcome_withdrawal_manager():
    json_sent = request.get_json()
    #send withdrawal id in json {"outcome_status":"rejected","outcome_reason":"gg","withdrawal_id":1}
-
+   #test change
    try:
       if json_sent["outcome_status"] == "rejected":
          response = supabase.table("withdrawals").update({"status": "rejected"}).eq("withdrawal_id", json_sent["withdrawal_id"]).execute()
