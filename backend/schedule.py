@@ -2,8 +2,6 @@
 
 
 
-
-
 from flask import Blueprint, request, jsonify
 from supabase_init import supabase
 from datetime import datetime, timedelta
