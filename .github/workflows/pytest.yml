@@ -28,8 +28,8 @@ jobs:
 
     - name: Create .env file
       run: |
-        echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> backend/.env
-        echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> backend/.env
+        echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+        echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
  
 
     - name: Install dependencies
