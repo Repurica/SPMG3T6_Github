@@ -46,11 +46,13 @@ def staff_store_withdrawal():
              #if the staff has no more applied dates, the status of the application will be set to withdrawn
             application_response = supabase.table("application").update({"status": "withdrawn","applied_dates":applied_dates[0]["applied_dates"]}).eq("application_id", application_id).execute()
             json_stored = {"withdrawal_id": withdrawal_id, "application_id": application_id,"staff_id": staff_id, "reason": reason, "withdrawal_status": "approved","withdrawn_dates": json_sent["withdrawn_dates"]}
+            withdrawal_response = supabase.table("withdrawals").insert(json_stored).execute()
 
          else:
             #if the staff still has applied dates, the status of the WFH application itself will still be pending, but the withdrawal request will be stored as approved
             application_response = supabase.table("application").update({"applied_dates":applied_dates[0]["applied_dates"]}).eq("application_id", application_id).execute()
             json_stored = {"withdrawal_id": withdrawal_id, "application_id": application_id,"staff_id": staff_id, "reason": reason, "withdrawal_status": "approved","withdrawn_dates": json_sent["withdrawn_dates"]}
+            withdrawal_response = supabase.table("withdrawals").insert(json_stored).execute()
          
          return {"count": count, "message": "Request has been withdrawn"}, 200
    except Exception as e:
