@@ -15,7 +15,9 @@ function ViewRequests() {
     const [loading, setLoading] = useState(true);
     const [notification, setNotification] = useState('');
 
-    const test_manager_id = 140894
+    //const test_manager_id = 140894
+    const test_manager_id = 180001
+
 
     const itemsPerPage = 3;
 
@@ -188,7 +190,7 @@ function ViewRequests() {
                     onMouseEnter={() => handleCardHover(key, true)} 
                     onMouseLeave={() => handleCardHover(key, false)}>
                         <p class="staff-name">{item.staff_fullname}</p>
-                        <p class="detail-text"><span class="detail-label">Position ID:</span> {item.staff_id}</p>
+                        <p class="detail-text"><span class="detail-label">Staff ID:</span> {item.staff_id}</p>
                         <p class="detail-text">
                             <span class="detail-label">Application Date:</span> {item.created_at} &nbsp;&nbsp;
                             {item.request_type === 'ad_hoc' ? (
