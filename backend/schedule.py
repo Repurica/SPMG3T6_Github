@@ -113,11 +113,7 @@ def get_staff_schedules():
 
 
 
-#     # Check if the staff exists
-#     if not staff_data.data:
-#         return jsonify({"error": "No staff found with this ID."}), 404
 
-#     # Get the position of the staff member
 #     staff_position = staff_data.data[0]['position']
 
 #     # Fetch all team members with the same position
