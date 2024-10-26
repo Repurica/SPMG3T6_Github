@@ -111,16 +111,7 @@ def get_staff_schedules():
 
 
 
-# @schedule.route('/team_schedules', methods=['GET'])
-# def get_team_schedules():
-#     # Get staff ID from the query parameters
-#     staff_id = request.args.get('staff_id')
-    
-#     # Fetch staff data for the given staff_id to get the position and department
-#     staff_data = supabase.table('employee') \
-#         .select('staff_fname, staff_lname, staff_id, position, role, dept') \
-#         .eq('staff_id', staff_id) \
-#         .execute()
+
 
 #     # Check if the staff exists
 #     if not staff_data.data:
