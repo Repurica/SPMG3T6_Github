@@ -70,14 +70,20 @@ def manager_view_withdrawals():
       response_employee = supabase.table("employee").select("staff_id", "staff_fname", "staff_lname").eq("reporting_manager", json_sent["manager_id"]).execute()
       list_of_staff_ids = []
       dict_staff_ids_names = {}
-      
+      #store the staff ids and names in a dictionary
       for staff_id_dict in response_employee.data:
          list_of_staff_ids.append(staff_id_dict["staff_id"])
       for staff_id_dict in response_employee.data:
          dict_staff_ids_names[staff_id_dict["staff_id"]] = staff_id_dict["staff_fname"] + " " + staff_id_dict["staff_lname"]
+
       #retrieve the withdrawal requests of the staff members who have the manager id as their reporting manager, and the status of the withdrawal request is pending
       returned_result = supabase.table("withdrawals").select("withdrawal_id","application_id", "reason","withdrawn_dates").in_("staff_id", list_of_staff_ids).eq("withdrawal_status", "pending").execute().data
-    
+      
+      #add the staff name, staff id, and wfh timing to the returned result
+      for result in returned_result:
+         result["staff_name"] = dict_staff_ids_names[supabase.table("application").select("staff_id").eq("application_id", result["application_id"]).execute().data[0]["staff_id"]]
+         result["staff_id"] = supabase.table("application").select("staff_id").eq("application_id", result["application_id"]).execute().data[0]["staff_id"]
+         result["wfh_timing"] = supabase.table("application").select("timing").eq("application_id", result["application_id"]).execute().data[0]["timing"]
       return jsonify(returned_result), 200
 
    except Exception as e:
