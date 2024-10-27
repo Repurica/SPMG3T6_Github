@@ -208,8 +208,11 @@ function ApplicationForm() {
   
   //check for empty values
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (timing === ''){
+    event.preventDefault();  
+    if (reason.trim() === ''){
+      alert('Please enter a non-empty reason for request')
+    }
+    else if (timing === ''){
       alert('Please select a timing')
     }
     else {
