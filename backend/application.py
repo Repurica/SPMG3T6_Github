@@ -344,9 +344,9 @@ def get_current_manpower_whole_day(date, test_manager_id):
 def get_all_requests_staff():
     # json is in the form of {"staff_id": 140002}
     json_sent = request.get_json()
-    test_staff_id = json_sent['staff_id']
+    staff_id = json_sent['staff_id']
     try:
-        application_response = supabase.table("application").select("*").eq("staff_id", test_staff_id).execute()
+        application_response = supabase.table("application").select("*").eq("staff_id", staff_id).execute()
         data = application_response.data
 
         for item in data:
@@ -372,8 +372,13 @@ def get_all_requests_staff():
 
         sorted_data = sorted(data, key=lambda x: datetime.strptime(x["created_at"], "%Y-%m-%d") if x["created_at"] != "Invalid date" else datetime.min)
         result_dict = {item["application_id"]: {key: value for key, value in item.items()} for item in sorted_data}
+        
+        # Get pending withdrawal dates
+        pending_withdrawal_dates = supabase.table("withdrawals").select("withdrawn_dates").eq("withdrawal_status", "pending").eq("staff_id",staff_id).execute().data
+        pending_withdrawal_dates = pending_withdrawal_dates[0]["withdrawn_dates"]["dates"]
         for item in result_dict.values():
             item.pop("application_id", None)
+            item["pending_withdrawal_dates"] = pending_withdrawal_dates
 
         return result_dict, 200
     except Exception as e:
@@ -399,7 +404,6 @@ def validate_date_range(date1: str, date2: str) -> str:
     else:
         return "invalid"
     
-
 
 
 
