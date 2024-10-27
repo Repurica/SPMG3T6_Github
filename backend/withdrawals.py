@@ -96,10 +96,10 @@ def store_outcome_withdrawal_manager():
     This function is used to store the outcome of the withdrawal request by the manager.
       This is the example json sent to the function (for frontend's ease of use):
       json_sent = {
-         "outcome_status": "rejected",
-         "outcome_reason": "gg",
-         "withdrawal_id": 1
-      }
+            "outcome_status": "rejected",
+            "outcome_reason": "gg",
+            "withdrawal_id": 1
+         }
     """
    json_sent = request.get_json()
    #send withdrawal id in json {"outcome_status":"rejected","outcome_reason":"gg","withdrawal_id":1}
@@ -107,11 +107,11 @@ def store_outcome_withdrawal_manager():
    try:
       #update the status of the withdrawal request to rejected (This is the case where the manager rejects the withdrawal request)
       if json_sent["outcome_status"] == "rejected":
-         response = supabase.table("withdrawals").update({"status": "rejected"}).eq("withdrawal_id", json_sent["withdrawal_id"]).execute()
+         response = supabase.table("withdrawals").update({"withdrawal_status": "rejected"}).eq("withdrawal_id", json_sent["withdrawal_id"]).execute()
          return {"status": "success", "message": "Withdrawal rejected successfully"}
       
       #update the status of the withdrawal request to approved (This is the case where the manager approves the withdrawal request)
-      response = supabase.table("withdrawals").update({"status": "approved","outcome_reason":json_sent["outcome_reason"]}).eq("withdrawal_id", json_sent["withdrawal_id"]).execute()
+      response = supabase.table("withdrawals").update({"withdrawal_status": "approved","outcome_reason":json_sent["outcome_reason"]}).eq("withdrawal_id", json_sent["withdrawal_id"]).execute()
       #get the application id, staff_id, and applied_dates of the withdrawal request
 
       withdrawal_details = supabase.table("withdrawals").select("staff_id","application_id","applied_dates").eq("withdrawal_id", json_sent["withdrawal_id"]).execute().data
