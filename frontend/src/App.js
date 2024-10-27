@@ -6,6 +6,7 @@ import NavBar from './NavBar';
 import ViewRequests from './ViewRequests'
 import './App.css'
 import OwnRequests from './OwnRequests';
+import WithdrawRequests from './WithdrawRequests';
 const App = () => {
   return (
     <div className="content">
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/applicationForm" element={<ApplicationForm />} />
         <Route path="/ViewRequests" element={<ViewRequests />} />
         <Route path="/OwnRequests" element={<OwnRequests />} />
+        <Route path="/WithdrawRequests" element={<WithdrawRequests />} />
       </Routes>
     </div>
   );
