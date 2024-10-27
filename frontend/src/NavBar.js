@@ -7,8 +7,9 @@ const NavBar = () => {
       <ul>
         <li><Link to="/">Schedule</Link></li>
         <li><Link to="/ApplicationForm">Application Form</Link></li>
-        <li><Link to="/ViewRequests">ViewRequests - temp route for now</Link></li>
-        <li><Link to="/OwnRequests">OwnRequests - temp route for now</Link></li>
+        <li><Link to="/ViewRequests">ViewWFHRequests</Link></li>
+        <li><Link to="/OwnRequests">OwnRequests</Link></li>
+        <li><Link to="/WithdrawRequests">WithdrawRequests</Link></li>
       </ul>
     </nav>
   );

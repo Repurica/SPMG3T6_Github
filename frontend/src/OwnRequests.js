@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './OwnRequests.css'; // Import the CSS file
 import { FaInbox } from 'react-icons/fa'; // Import the inbox icon
 import { fetchWithRetry } from './FetchWithRetry';
+import WithdrawalModal from './WithdrawalModal';
+import ApplicationNotificationModal from './ApplicationNotificationModal';
 
 
 function OwnRequests() {
@@ -10,10 +12,17 @@ function OwnRequests() {
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("all");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedApplication, setApplication] = useState(null);
+    const [reason, setReason] = useState("");
+    const [notification, setNotification] = useState('');
+
+
 
     // 140002 for view testing
-    //140004
-    const staff_id = 140004
+    const staff_id = 140002
+    //const staff_id = 140004
 
     const itemsPerPage = 3;
 
@@ -48,43 +57,89 @@ function OwnRequests() {
 
     const currentItems = getCurrentItems();
 
-    const handleCardClick = (key) => {
-        console.log(`Card with key ${key} clicked`);
-        // Add logic for card click, such as opening a detailed view or modal
-        const item = currentItems.find(([k]) => k === key)[1];
-    
-    };
     
     const handleCardHover = (key, isHovering) => {
 
     };
 
-    const WithdrawButton = ({app_status, valid}) => {
+    const WithdrawButton = ({app_status, valid, selected_item, selected_application}) => {
         if ((app_status === 'pending')){
             return ( 
                 <div className="button-container">
-                    <button onClick={handleWithdraw} className="withdraw-button">Withdraw</button>
+                    <button onClick={() => handleWithdraw(selected_item, selected_application)} className="withdraw-button">Withdraw</button>
                 </div>
             )
         }
         else if (app_status === 'approved' && (valid === 'valid')){
             return ( 
                 <div className="button-container">
-                    <button onClick={handleWithdraw} className="withdraw-button">Withdraw</button>
+                    <button onClick={() => handleWithdraw(selected_item, selected_application)} className="withdraw-button">Withdraw</button>
                 </div>
             )
         }
         else if (app_status === 'approved' && (valid === 'invalid')){
             return ( 
                 <div className="button-container">
-                    <button onClick={handleWithdraw} className="withdraw-button" disabled = {true}>Withdraw</button>
+                    <button onClick={() => handleWithdraw(selected_item, selected_application)} className="withdraw-button" disabled = {true}>Withdraw</button>
                 </div>
             )
 
         }
     }
+    // to note: if applied_dates after update in backend = 0, set status of application to withdrawn
+    const handleWithdraw = (selected_item, selected_application) => {
+        setSelectedItem(selected_item);
+        setApplication(selected_application)
+        setIsModalOpen(true);
 
-    const handleWithdraw = () => {
+    }
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedItem(null);
+        setApplication(null);
+        setReason("");
+      };
+
+    //for after modal after approve/reject
+    const handleClose = () => {
+        window.location.reload(); // Refresh Page
+      };
+
+    
+    const handleApply = async (dateStatus) => {
+        let trueDates = Object.keys(dateStatus).filter(date => dateStatus[date])
+        let toSend = { 
+            "staff_id" : staff_id,
+            "application_id" : Number(selectedApplication),
+            "reason" : reason,
+            "status_of_request" : selectedItem.status,
+            "withdrawn_dates" : {"dates":trueDates},
+         }
+         console.log(toSend)         
+         try {
+            const response = await fetch('http://localhost:5000/withdrawals/staff_store_withdrawal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(toSend),
+            });
+    
+            if (response.ok) {
+                const jsonResponse = await response.json();
+                console.log('Success:', jsonResponse);
+                if (selectedItem.status === 'pending')
+                setNotification(`Dates Withdrawn!`);
+                else {
+                    setNotification(`Request Sent!`)
+                }
+            } else {
+                console.error('Error:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
 
     }
 
@@ -148,15 +203,15 @@ function OwnRequests() {
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>
+                    <option value="withdrawn">Withdrawn</option>
                 </select>
             </div>
             <div>
                 {currentItems.map(([key, item]) => (
                     <div key={key} className="request-card"
-                    onClick={() => handleCardClick(key)}
                     onMouseEnter={() => handleCardHover(key, true)} 
                     onMouseLeave={() => handleCardHover(key, false)}>
-                        <WithdrawButton app_status={item.status} valid = {item.validity_of_withdrawal}></WithdrawButton>
+                        <WithdrawButton app_status={item.status} valid = {item.validity_of_withdrawal} selected_item = {item} selected_application = {key}></WithdrawButton>
                         <p class="detail-text">
                             <span class="detail-label">Application Date:</span> {item.created_at} &nbsp;&nbsp;
                             {item.request_type === 'ad_hoc' ? (
@@ -185,6 +240,9 @@ function OwnRequests() {
                             {item.status === 'pending' ? (
                                 <span class="detail-label">Status: <span class="detail-text" style={{color: "blue"}}>Pending</span></span> 
                             ) : 
+                            item.status === 'withdrawn' ? (
+                                <span class="detail-label">Status: <span class="detail-text" style={{color: "grey"}}>Withdrawn</span></span> 
+                            ) : 
                             item.status === 'approved' ? (
                                 <span class="detail-label">Status: <span class="detail-text" style={{color: "green"}}>Approved</span></span> 
                             ) : (
@@ -201,6 +259,16 @@ function OwnRequests() {
                 ))}
 
             </div>
+            <WithdrawalModal 
+                        isOpen={isModalOpen}
+                        selectedItem={selectedItem}
+                        reason={reason}
+                        setReason={setReason}
+                        handleApply={handleApply}
+                        handleClose={handleCloseModal}
+                        />
+
+            
             <div className="pagination">
                 <button className="navigate" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
                     Previous
@@ -210,6 +278,9 @@ function OwnRequests() {
                     Next
                 </button>
             </div>
+            <ApplicationNotificationModal message={notification} onClose={handleClose} /> 
+
+
         </div>
     );
 }
