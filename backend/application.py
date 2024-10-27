@@ -374,11 +374,16 @@ def get_all_requests_staff():
         result_dict = {item["application_id"]: {key: value for key, value in item.items()} for item in sorted_data}
         
         # Get pending withdrawal dates
-        pending_withdrawal_dates = supabase.table("withdrawals").select("withdrawn_dates").eq("withdrawal_status", "pending").eq("staff_id",staff_id).execute().data
-        pending_withdrawal_dates = pending_withdrawal_dates[0]["withdrawn_dates"]["dates"]
+        
         for item in result_dict.values():
+            application_id = item["application_id"]
+            pending_withdrawal_date_list = []
+            withdrawal_response = supabase.table("withdrawals").select("withdrawn_dates").eq("withdrawal_status", "pending").eq("application_id", application_id).execute().data
+            for record in withdrawal_response:
+               for date in record["withdrawn_dates"]["dates"]:
+                 pending_withdrawal_date_list.append(date)
+            item["pending_withdrawal_dates"] = pending_withdrawal_date_list
             item.pop("application_id", None)
-            item["pending_withdrawal_dates"] = pending_withdrawal_dates
 
         return result_dict, 200
     except Exception as e:
@@ -404,7 +409,16 @@ def validate_date_range(date1: str, date2: str) -> str:
     else:
         return "invalid"
     
-
+@application.route('/test', methods=['GET'])
+def test():
+   my_list = []
+   withdrawal_response = supabase.table("withdrawals").select("withdrawn_dates").eq("withdrawal_status", "pending").eq("application_id", 4).execute().data
+   for record in withdrawal_response:
+      for date in record["withdrawn_dates"]["dates"]:
+         my_list.append(date)
+   print(my_list)
+      
+   return {"results":my_list}, 200
 
 
    
