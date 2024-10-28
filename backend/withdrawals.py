@@ -114,37 +114,52 @@ def store_outcome_withdrawal_manager():
       response = supabase.table("withdrawals").update({"withdrawal_status": "approved","outcome_reason":json_sent["outcome_reason"]}).eq("withdrawal_id", json_sent["withdrawal_id"]).execute()
       #get the application id, staff_id, and applied_dates of the withdrawal request
 
-      withdrawal_details = supabase.table("withdrawals").select("staff_id","application_id","applied_dates").eq("withdrawal_id", json_sent["withdrawal_id"]).execute().data
-
+      withdrawal_details = supabase.table("withdrawals").select("staff_id","application_id","withdrawn_dates").eq("withdrawal_id", json_sent["withdrawal_id"]).execute().data
+      
       application_id = withdrawal_details[0]["application_id"]
-
-      applied_dates = withdrawal_details[0]["applied_dates"]["dates"]
+      applied_dates = supabase.table("application").select("applied_dates").eq("application_id", application_id).execute().data
+      applied_dates = applied_dates[0]["applied_dates"]["dates"]
+      print(applied_dates)
       staff_id = withdrawal_details[0]["staff_id"]
 
 
       #select withdrawn dates of the withdrawal request
-      withdrawn_dates = supabase.table("withdrawals").select("withdrawn_dates").eq("withdrawal_id", json_sent["withdrawal_id"]).execute().data[0]["withdrawn_dates"]
+      withdrawn_dates = supabase.table("withdrawals").select("withdrawn_dates").eq("withdrawal_id", json_sent["withdrawal_id"]).execute().data[0]["withdrawn_dates"]["dates"]
+      print(withdrawn_dates)
 
+      # return {"withdrawn_dates":withdrawn_dates,"applied_dates":applied_dates["applied_dates"]["dates"]}
 
       #update application dates in application table
       for date in withdrawn_dates:
-         if date in applied_dates:
-            applied_dates.remove(date)
+         
          date_obj = datetime.strptime(date, "%Y-%m-%d")
          day_of_week = date_obj.strftime("%A").lower()
          update_schedule = supabase.table("schedule").update({day_of_week: "in_office"}).lte("starting_date",date).gte("end_date",date).eq("staff_id", staff_id).execute()
+         if date in applied_dates:
+            applied_dates.remove(date)
+
       # update the applied dates of the staff member in the application table(this is the case where the staff member has no more applied dates)
       if len(applied_dates) == 0:
-         application_response = supabase.table("application").update({"status": "withdrawn","applied_dates":applied_dates}).eq("application_id", application_id).execute()
-         return {"status": "success", "message": "Withdrawal approved successfully","updated_info":application_response}
+         application_response = supabase.table("application").update({"status": "withdrawn","applied_dates":{"dates":applied_dates}}).eq("application_id", application_id).execute()
+         return {"status": "success", "message": "Withdrawal approved successfully","updated_info":application_response.data}
       
       # update the applied dates of the staff member in the application table(this is the case where the staff member still has applied dates)
-      application_response = supabase.table("application").update("applied_dates",{"dates":applied_dates}).eq("application_id", application_id).execute()
+      application_response = supabase.table("application").update({"applied_dates",{"dates":applied_dates}}).eq("application_id", application_id).execute()
       
-      return {"status": "success", "message": "Withdrawal approved successfully","updated_info":application_response}
+      return {"status": "success", "message": "Withdrawal approved successfully","updated_info":application_response.data}
    
    
    except Exception as e:
       traceback.print_exc()
       return {"status": "error", "message": str(e)},500
    
+@withdrawals.route("/test",methods=['POST'])
+def test():
+   json_sent = request.get_json()
+   withdrawal_id = 1
+   withdrawal_details = supabase.table("withdrawals").select("staff_id","application_id","withdrawn_dates").eq("withdrawal_id", withdrawal_id).execute().data
+   withdrawal_dates = withdrawal_details[0]["withdrawn_dates"]["dates"]
+   application_id = withdrawal_details[0]["application_id"]
+   staff_id = withdrawal_details[0]["staff_id"]
+   applied_dates = supabase.table("application").select("applied_dates").eq("application_id", application_id).execute().data
+   return {"withdrawal_dates":withdrawal_dates,"application_id":application_id,"staff_id":staff_id,"applied_dates":applied_dates[0]["applied_dates"]["dates"]}
