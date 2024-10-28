@@ -5,7 +5,7 @@ import sys
 import os
 # adding Folder_2 to the system path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from application import application, get_current_manpower_AM, get_current_manpower_PM, get_current_manpower_whole_day
+from application import application, get_current_manpower_AM, get_current_manpower_PM, get_current_manpower_whole_day, get_matching_weekday_dates, get_dates_on_same_weekday
 from datetime import datetime
 
 mock_date = "2023-10-01"
@@ -94,3 +94,50 @@ def test_get_current_manpower_whole_day_invalid(mock_supabase):
     response, status_code = get_current_manpower_whole_day("2024-10-07", 1)
     assert status_code == 200
     assert response["status_whole_day"] == "invalid"
+
+def test_get_matching_weekday_dates():
+    start_date = "2023-10-01"  # Sunday
+    end_date = "2023-10-31"    # Tuesday
+    expected_dates = [
+        "2023-10-01", "2023-10-08", "2023-10-15", "2023-10-22", "2023-10-29"
+    ]
+    result = get_matching_weekday_dates(start_date, end_date)
+    assert result == expected_dates
+
+def test_get_matching_weekday_dates_single_day():
+    start_date = "2023-10-01"  # Sunday
+    end_date = "2023-10-01"    # Sunday
+    expected_dates = ["2023-10-01"]
+    result = get_matching_weekday_dates(start_date, end_date)
+    assert result == expected_dates
+
+def test_get_matching_weekday_dates_no_match():
+    start_date = "2023-10-02"  # Monday
+    end_date = "2023-10-03"    # Tuesday
+    expected_dates = ["2023-10-02"]
+    result = get_matching_weekday_dates(start_date, end_date)
+    assert result == expected_dates
+
+def test_get_dates_on_same_weekday():
+    start_date = "2023-10-01"  # Sunday
+    end_date = "2023-10-31"    # Tuesday
+    expected_dates = [
+        datetime(2023, 10, 1), datetime(2023, 10, 8), datetime(2023, 10, 15),
+        datetime(2023, 10, 22), datetime(2023, 10, 29)
+    ]
+    result = get_dates_on_same_weekday(start_date, end_date)
+    assert result == expected_dates
+
+def test_get_dates_on_same_weekday_single_day():
+    start_date = "2023-10-01"  # Sunday
+    end_date = "2023-10-01"    # Sunday
+    expected_dates = [datetime(2023, 10, 1)]
+    result = get_dates_on_same_weekday(start_date, end_date)
+    assert result == expected_dates
+
+def test_get_dates_on_same_weekday_no_match():
+    start_date = "2023-10-02"  # Monday
+    end_date = "2023-10-03"    # Tuesday
+    expected_dates = [datetime(2023, 10, 2)]
+    result = get_dates_on_same_weekday(start_date, end_date)
+    assert result == expected_dates
