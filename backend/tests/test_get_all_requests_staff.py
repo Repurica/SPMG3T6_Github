@@ -8,9 +8,9 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # adding Folder_2 to the system path
 # sys.path.insert(0, 'C:\wamp64\www\SPMG3T6_Github\\backend')
-from application import application
+from application import application, validate_date_range
 from app import app
-from datetime import datetime
+from datetime import datetime, timedelta
 
 @pytest.fixture
 def client():
@@ -81,3 +81,39 @@ def test_get_all_requests_staff_exception(mock_validate_date_range, mock_supabas
     assert response.status_code == 500
     assert "info" in response.json
     assert response.json["info"] == "Exception('Database error')"
+
+def test_validate_date_range_within_range():
+    date1 = "2023-10-01"
+    date2 = (datetime.strptime(date1, "%Y-%m-%d") + timedelta(days=10)).strftime("%Y-%m-%d")
+    result = validate_date_range(date1, date2)
+    assert result == "valid"
+
+def test_validate_date_range_exact_lower_bound():
+    date1 = "2023-10-01"
+    date2 = (datetime.strptime(date1, "%Y-%m-%d") - timedelta(weeks=2)).strftime("%Y-%m-%d")
+    result = validate_date_range(date1, date2)
+    assert result == "valid"
+
+def test_validate_date_range_exact_upper_bound():
+    date1 = "2023-10-01"
+    date2 = (datetime.strptime(date1, "%Y-%m-%d") + timedelta(weeks=2)).strftime("%Y-%m-%d")
+    result = validate_date_range(date1, date2)
+    assert result == "valid"
+
+def test_validate_date_range_below_lower_bound():
+    date1 = "2023-10-01"
+    date2 = (datetime.strptime(date1, "%Y-%m-%d") - timedelta(weeks=2, days=1)).strftime("%Y-%m-%d")
+    result = validate_date_range(date1, date2)
+    assert result == "invalid"
+
+def test_validate_date_range_above_upper_bound():
+    date1 = "2023-10-01"
+    date2 = (datetime.strptime(date1, "%Y-%m-%d") + timedelta(weeks=2, days=1)).strftime("%Y-%m-%d")
+    result = validate_date_range(date1, date2)
+    assert result == "invalid"
+
+def test_validate_date_range_same_day():
+    date1 = "2023-10-01"
+    date2 = "2023-10-01"
+    result = validate_date_range(date1, date2)
+    assert result == "valid"
