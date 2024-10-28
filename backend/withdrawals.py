@@ -107,7 +107,7 @@ def store_outcome_withdrawal_manager():
    try:
       #update the status of the withdrawal request to rejected (This is the case where the manager rejects the withdrawal request)
       if json_sent["outcome_status"] == "rejected":
-         response = supabase.table("withdrawals").update({"withdrawal_status": "rejected"}).eq("withdrawal_id", json_sent["withdrawal_id"]).execute()
+         response = supabase.table("withdrawals").update({"withdrawal_status": "rejected","outcome_reason":json_sent["outcome_reason"]}).eq("withdrawal_id", json_sent["withdrawal_id"]).execute()
          return {"status": "success", "message": "Withdrawal rejected successfully"}
       
       #update the status of the withdrawal request to approved (This is the case where the manager approves the withdrawal request)
@@ -144,7 +144,7 @@ def store_outcome_withdrawal_manager():
          return {"status": "success", "message": "Withdrawal approved successfully","updated_info":application_response.data}
       
       # update the applied dates of the staff member in the application table(this is the case where the staff member still has applied dates)
-      application_response = supabase.table("application").update({"applied_dates",{"dates":applied_dates}}).eq("application_id", application_id).execute()
+      application_response = supabase.table("application").update({"applied_dates":{"dates":applied_dates}}).eq("application_id", application_id).execute()
       
       return {"status": "success", "message": "Withdrawal approved successfully","updated_info":application_response.data}
    
