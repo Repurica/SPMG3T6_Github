@@ -1,81 +1,122 @@
-# import pytest
-# from unittest.mock import patch, MagicMock
-# from flask import Flask, request
-# import sys
-# import os
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# from withdrawals import withdrawals
+import pytest
+from unittest.mock import patch, MagicMock
+from flask import Flask, jsonify
+import sys
+import os
+from withdrawals import withdrawals
 
-# @pytest.fixture
-# def app():
-#     app = Flask(__name__)
-#     app.config.update({
-#         "TESTING": True,
-#     })
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-#     # Register the withdrawals Blueprint with the app
-#     app.register_blueprint(withdrawals, url_prefix="/")
+@pytest.fixture
+def client():
+    app = Flask(__name__)
+    app.register_blueprint(withdrawals)
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
 
-#     return app
+@patch('withdrawals.supabase')
+def test_staff_store_withdrawal_approved(mock_supabase, client):
+    mock_supabase.table.return_value.select.return_value.execute.return_value.data = [{"withdrawal_id": 1}]
+    mock_supabase.table.return_value.insert.return_value.execute.return_value = MagicMock()
 
-# @pytest.fixture
-# def client(app):
-#     return app.test_client()
+    response = client.post('/staff_store_withdrawal', json={
+        "staff_id": 140003,
+        "application_id": 2,
+        "reason": "withdraw reason",
+        "status_of_request": "approved",
+        "withdrawn_dates": {"dates": ["2023-01-01", "2023-01-02", "2023-01-03"]}
+    })
 
-# # Test staff_store_withdrawal function for 'approved' case
-# @patch('withdrawals.supabase')  # Mock the supabase object
-# def test_staff_store_withdrawal_approved(mock_supabase, client):
-#     # Mock supabase responses
-#     mock_supabase.table().select().execute().data = [{'withdrawal_id': 1}]
-#     mock_supabase.table().insert().execute.return_value = MagicMock()
+    assert response.status_code == 200
+    assert response.json == {"count": 1, "message": "Withdrawal request submitted successfully"}
 
-#     # Call the function using the test client and send the request data
-#     response = client.post('/store_withdrawal', json={
-#         "staff_id": 140003,
-#         "application_id": 2,
-#         "reason": "withdraw reason",
-#         "status_of_request": "approved",
-#         "withdrawn_dates": {"dates": ["2023-01-01", "2023-01-02", "2023-01-03"]}
-#     })
+@patch('withdrawals.supabase')
+def test_staff_store_withdrawal_pending(mock_supabase, client):
+    mock_supabase.table.return_value.select.return_value.execute.return_value.data = [{"withdrawal_id": 1}]
+    mock_supabase.table.return_value.insert.return_value.execute.return_value = MagicMock()
+    mock_supabase.table.return_value.update.return_value.execute.return_value = MagicMock()
 
-#     # Assertions
-#     assert response.status_code == 200
-#     assert response.json['message'] == 'Withdrawal request submitted successfully'
+    response = client.post('/staff_store_withdrawal', json={
+        "staff_id": 140003,
+        "application_id": 2,
+        "reason": "withdraw reason",
+        "status_of_request": "pending",
+        "withdrawn_dates": {"dates": ["2023-01-01", "2023-01-02", "2023-01-03"]}
+    })
 
-# # Test staff_store_withdrawal function for non-approved case
-# @patch('withdrawals.supabase')  # Mock the supabase object
-# def test_staff_store_withdrawal_non_approved(mock_supabase, client):
-#     # Mock supabase responses for the non-approved case
-#     mock_supabase.table().select().eq().execute().data = [{"applied_dates": ["2023-01-01", "2023-01-02"]}]
-#     mock_supabase.table().update().eq().execute.return_value = MagicMock()
+    assert response.status_code == 200
+    assert response.json == {"count": 1, "message": "Request has been withdrawn"}
 
-#     # Call the function using the test client and send the request data
-#     response = client.post('/store_withdrawal', json={
-#         "staff_id": 140003,
-#         "application_id": 2,
-#         "reason": "withdraw reason",
-#         "status_of_request": "pending",
-#         "withdrawn_dates": {"dates": ["2023-01-01", "2023-01-02", "2023-01-03"]}
-#     })
+#######################to check#################################
 
-#     # Assertions
-#     assert response.status_code == 200
-#     assert response.json['message'] == 'Request has been withdrawn'
+@patch('withdrawals.supabase')
+def test_manager_view_withdrawals(mock_supabase, client):
+    mock_supabase.table.return_value.select.return_value.execute.return_value.data = [
+        {"staff_id": 140003, "staff_fname": "John", "staff_lname": "Doe"}
+    ]
+    mock_supabase.table.return_value.select.return_value.execute.return_value.data = [
+        {"withdrawal_id": 1, "application_id": 2, "reason": "withdraw reason", "withdrawn_dates": {"dates": ["2023-01-01"]}}
+    ]
+    mock_supabase.table.return_value.select.return_value.execute.return_value.data = [
+        {"staff_id": 140003, "timing": "9-5"}
+    ]
 
-# # Test manager_view_withdrawals function
-# @patch('withdrawals.supabase')
-# def test_manager_view_withdrawals(mock_supabase, client):
-#     # Mock supabase response
-#     mock_supabase.table().select().execute().data = [
-#         {"withdrawal_id": 1, "staff_id": 140003, "reason": "Sample reason"}
-#     ]
+    response = client.post('/retrieve_withdrawals', json={"manager_id": 140894})
 
-#     # Call the function using the test client and send the request data
-#     response = client.post('/retrieve_withdrawals', json={
-#         "manager_id": 1001
-#     })
+    assert response.status_code == 200
+    assert response.json == [
+        {"withdrawal_id": 1, "application_id": 2, "reason": "withdraw reason", "withdrawn_dates": {"dates": ["2023-01-01"]}, "staff_name": "John Doe", "staff_id": 140003, "wfh_timing": "9-5"}
+    ]
 
-#     # Assertions
-#     assert response.status_code == 200
-#     assert len(response.json) == 1
-#     assert response.json[0]['reason'] == 'Sample reason'
+@patch('withdrawals.supabase')
+def test_store_outcome_withdrawal_manager_approved(mock_supabase, client):
+    mock_supabase.table.return_value.update.return_value.execute.return_value = MagicMock()
+    mock_supabase.table.return_value.select.return_value.execute.return_value.data = [
+        {"staff_id": 140003, "application_id": 2, "applied_dates": {"dates": ["2023-01-01", "2023-01-02", "2023-01-03"]}}
+    ]
+    mock_supabase.table.return_value.select.return_value.execute.return_value.data = [
+        {"withdrawn_dates": ["2023-01-01", "2023-01-02", "2023-01-03"]}
+    ]
+    mock_supabase.table.return_value.update.return_value.execute.return_value = MagicMock()
+
+    response = client.post('/manager_approve_reject_withdrawal', json={
+        "outcome_status": "approved",
+        "outcome_reason": "valid reason",
+        "withdrawal_id": 1
+    })
+
+    assert response.status_code == 200
+    assert response.json == {"status": "success", "message": "Withdrawal approved successfully", "updated_info": MagicMock()}
+
+@patch('withdrawals.supabase')
+def test_store_outcome_withdrawal_manager_rejected(mock_supabase, client):
+    mock_supabase.table.return_value.update.return_value.execute.return_value = MagicMock()
+
+    response = client.post('/manager_approve_reject_withdrawal', json={
+        "outcome_status": "rejected",
+        "outcome_reason": "invalid reason",
+        "withdrawal_id": 1
+    })
+
+    assert response.status_code == 200
+    assert response.json == {"status": "success", "message": "Withdrawal rejected successfully"}
+
+@patch('withdrawals.supabase')
+def test_test_endpoint(mock_supabase, client):
+    mock_supabase.table.return_value.select.return_value.execute.return_value.data = [
+        {"staff_id": 140003, "application_id": 2, "withdrawn_dates": {"dates": ["2023-01-01", "2023-01-02", "2023-01-03"]}}
+    ]
+    mock_supabase.table.return_value.select.return_value.execute.return_value.data = [
+        {"applied_dates": {"dates": ["2023-01-01", "2023-01-02", "2023-01-03"]}}
+    ]
+
+    response = client.post('/test', json={})
+
+    assert response.status_code == 200
+    assert response.json == {
+        "withdrawal_dates": ["2023-01-01", "2023-01-02", "2023-01-03"],
+        "application_id": 2,
+        "staff_id": 140003,
+        "applied_dates": ["2023-01-01", "2023-01-02", "2023-01-03"]
+    }
