@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './ViewRequests.css'; // Import the CSS file
 import { FaInbox } from 'react-icons/fa'; // Import the inbox icon
-import DetailedRequestModal from './DetailedRequestModal';
+import DetailedWithdrawModal from './DetailedWithdrawModal';
 import { fetchWithRetry } from './FetchWithRetry';
 import ApplicationNotificationModal from './ApplicationNotificationModal';
 
@@ -71,13 +71,14 @@ function WithdrawRequests() {
         else {
             console.log("Accepted:", selectedItem);
             console.log("Reason:", reason);
+    
             let toSend = { 
-                "id" : selectedItem['application_id'],
-                "outcome": "approved",
-                "outcome_reason" : reason      
+                "outcome_status": "approved",
+                "outcome_reason": reason,
+                "withdrawal_id": selectedItem.withdrawal_id   
              }         
              try {
-                const response = await fetch('http://localhost:5000/application/store_approval_rejection', {
+                const response = await fetch('http://localhost:5000/withdrawals/manager_approve_reject_withdrawal', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -105,15 +106,13 @@ function WithdrawRequests() {
             alert('Enter a reason for rejection!')
         }
         else{
-            console.log("Rejected:", selectedItem);
-            console.log("Reason:", reason);
             let toSend = { 
-                "id" : selectedItem['application_id'],
-                "outcome": "rejected",
-                "outcome_reason" : reason      
+                "outcome_status": "rejected",
+                "outcome_reason": reason,
+                "withdrawal_id": selectedItem.withdrawal_id   
              }          
              try {
-                const response = await fetch('http://localhost:5000/application/store_approval_rejection', {
+                const response = await fetch('http://localhost:5000/withdrawals/manager_approve_reject_withdrawal', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -189,34 +188,18 @@ function WithdrawRequests() {
                     onClick={() => handleCardClick(key)}
                     onMouseEnter={() => handleCardHover(key, true)} 
                     onMouseLeave={() => handleCardHover(key, false)}>
-                        <p class="staff-name">{item.staff_fullname}</p>
+                        <p class="staff-name">{item.staff_name}</p>
                         <p class="detail-text"><span class="detail-label">Staff ID:</span> {item.staff_id}</p>
-                        <p class="detail-text">
-                            <span class="detail-label">Application Date:</span> {item.created_at} &nbsp;&nbsp;
-                            {item.request_type === 'ad_hoc' ? (
-                                <span class="detail-label">Type: <span class="detail-text">Ad Hoc</span></span> 
-                            ) : (
-                                <span class="detail-label">Type: <span class="detail-text">Recurring</span></span>
-                            )}
-                        </p>
+                        <p class="detail-text"><span class="detail-label">Dates to Withdraw:</span> {item.withdrawn_dates.dates.join(", ")}</p>
 
-                        {item.request_type === 'ad_hoc' ? (
-                            <p class="detail-text"><span class="detail-label">Start Date:</span> {item.starting_date}</p>
-                        ) : (
-                            <p class="detail-text">
-                                <span class="detail-label">Start Date:</span> {item.starting_date} &nbsp;&nbsp;
-                                <span class="detail-label">End Date:</span> {item.end_date}
-                            </p>
-                        )}
-
-                        {item.timing === "full_day" ? (
+                        {item.wfh_timing === "full_day" ? (
                             <p class="detail-text"><span class="detail-label">Timing:</span> Full Day</p>
                         ) : (
-                            <p class="detail-text"><span class="detail-label">Timing:</span> {item.timing}</p>
+                            <p class="detail-text"><span class="detail-label">Timing:</span> {item.wfh_timing}</p>
                         )}                    
                         </div>
                 ))}
-                      <DetailedRequestModal 
+                      <DetailedWithdrawModal 
                         isOpen={isModalOpen}
                         selectedItem={selectedItem}
                         reason={reason}
