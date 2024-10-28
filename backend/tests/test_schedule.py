@@ -2,12 +2,13 @@ import unittest
 from flask import Flask
 from flask.testing import FlaskClient
 from unittest.mock import patch, MagicMock
-from schedule import schedule
+
 import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app import app
+from schedule import schedule
 
 class ScheduleTestCase(unittest.TestCase):
     def setUp(self):

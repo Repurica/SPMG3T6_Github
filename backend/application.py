@@ -109,7 +109,6 @@ def store_application():
 @application.route('/retrieve_pending_requests', methods=['POST'])
 def retrieve_pending_requests():
    json_sent = request.get_json()
-   # print(json_sent["manager_id"])
    try:
       response_employee = supabase.table("employee").select("staff_id", "staff_fname", "staff_lname").eq("reporting_manager", json_sent["manager_id"]).execute()
       list_of_staff_ids = []
@@ -122,7 +121,6 @@ def retrieve_pending_requests():
          
       response_application = supabase.table("application").select("application_id", "staff_id", "created_at", "starting_date", "end_date", "timing", "request_type", "reason").in_("staff_id", list_of_staff_ids).eq("status", "pending").execute()
       returned_result = response_application.data
-      # print(dict_staff_ids_names)
       for record in returned_result:
          record_staff_id = record["staff_id"]
          record["staff_fullname"] = dict_staff_ids_names[record_staff_id]
@@ -131,7 +129,6 @@ def retrieve_pending_requests():
          request_type = record["request_type"]
          timing = record["timing"]
          
-         # print(request_type,timing)
          if request_type == "recurring":
             dates_between = get_matching_weekday_dates(starting_date, end_date) # eg. [2024-10-08, 2024-10-15, 2024-10-22]
             if timing == "AM":
@@ -312,10 +309,6 @@ def get_current_manpower_PM(date, test_manager_id):
    
 
 
-
-#create AM counter and PM counter
-# for each am add +1 to am, pm also same then full day add +1 to both (how many ppl not in office)
-
 def get_current_manpower_whole_day(date, test_manager_id):
    try:
       
@@ -408,17 +401,6 @@ def validate_date_range(date1: str, date2: str) -> str:
         return "valid"
     else:
         return "invalid"
-    
-@application.route('/test', methods=['GET'])
-def test():
-   my_list = []
-   withdrawal_response = supabase.table("withdrawals").select("withdrawn_dates").eq("withdrawal_status", "pending").eq("application_id", 4).execute().data
-   for record in withdrawal_response:
-      for date in record["withdrawn_dates"]["dates"]:
-         my_list.append(date)
-   print(my_list)
-      
-   return {"results":my_list}, 200
 
 
    
