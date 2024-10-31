@@ -357,6 +357,9 @@ def get_all_requests_staff():
             try:
                 starting_date = item["starting_date"]
                 current_date = datetime.now().strftime("%Y-%m-%d")
+                current_date = "2024-10-18" #test date 1
+                #current_date = "2024-09-19" #test date 2
+
                 condition = validate_date_range(starting_date, current_date)
                 item["validity_of_withdrawal"] = condition
             except Exception as e:
