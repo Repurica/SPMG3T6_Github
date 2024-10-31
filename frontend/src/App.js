@@ -7,12 +7,14 @@ import ViewRequests from './ViewRequests'
 import './App.css'
 import OwnRequests from './OwnRequests';
 import WithdrawRequests from './WithdrawRequests';
+import LogIn from './LogIn';
 const App = () => {
   return (
     <div className="content">
       <NavBar />
       <Routes>
-        <Route path="/" element={<StaffScheduler />} />
+        <Route path="/" element={<LogIn />} />
+        <Route path="/StaffScheduler" element={<StaffScheduler />} />
         <Route path="/applicationForm" element={<ApplicationForm />} />
         <Route path="/ViewRequests" element={<ViewRequests />} />
         <Route path="/OwnRequests" element={<OwnRequests />} />

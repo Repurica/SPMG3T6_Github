@@ -1,5 +1,4 @@
 import 'devextreme/dist/css/dx.material.blue.light.css';
-// import 'devextreme/dist/css/dx.fluent.blue.light.css';
 import './StaffScheduler.css';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Scheduler, View, Resource } from 'devextreme-react/scheduler';
@@ -68,11 +67,22 @@ function StaffScheduler() {
     // Choose own/team schedules based on current resource selection
     const getSchedule = () => {
         if (currentResource === 'Own Schedule') {
-            return ownSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0)
+            const schedule = ownSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0)
             && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0));  // show only schedules 2m back, 3m forward
+
+            // Format schedule display text
+            return schedule.map(item => ({
+                ...item,
+                wfhText: `${item.wfh} WFH`
+            }));
         } else if (currentResource === 'Team Schedule') {
-            return teamSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0) 
+            const schedule = teamSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0) 
             && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0));
+
+            return schedule.map(item => ({
+                ...item,
+                wfhText: `${item.wfh} WFH`
+            }));
         }
         return [];
     };
@@ -101,7 +111,7 @@ function StaffScheduler() {
                 firstDayOfWeek={1}
                 startDayHour={9}
                 endDayHour={18}
-                textExpr="wfh"
+                textExpr='wfhText'
                 defaultCurrentView="timelineDay"
                 min={startDate}
                 max={endDate}

@@ -5,7 +5,7 @@ const NavBar = () => {
   return (
     <nav class="navbar">
       <ul>
-        <li><Link to="/">Schedule</Link></li>
+        <li><Link to="/StaffScheduler">Schedule</Link></li>
         <li><Link to="/ApplicationForm">Application Form</Link></li>
         <li><Link to="/ViewRequests">ViewWFHRequests</Link></li>
         <li><Link to="/OwnRequests">OwnRequests</Link></li>
