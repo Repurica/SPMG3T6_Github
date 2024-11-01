@@ -155,11 +155,7 @@ def store_outcome_withdrawal_manager():
    
 @withdrawals.route("/test",methods=['POST'])
 def test():
-   json_sent = request.get_json()
-   withdrawal_id = 1
-   withdrawal_details = supabase.table("withdrawals").select("staff_id","application_id","withdrawn_dates").eq("withdrawal_id", withdrawal_id).execute().data
-   withdrawal_dates = withdrawal_details[0]["withdrawn_dates"]["dates"]
-   application_id = withdrawal_details[0]["application_id"]
-   staff_id = withdrawal_details[0]["staff_id"]
-   applied_dates = supabase.table("application").select("applied_dates").eq("application_id", application_id).execute().data
-   return {"withdrawal_dates":withdrawal_dates,"application_id":application_id,"staff_id":staff_id,"applied_dates":applied_dates[0]["applied_dates"]["dates"]}
+   list_of_staff_ids = [140003,140002]
+   returned_result = supabase.table("withdrawals").select("withdrawal_id","application_id", "reason","withdrawn_dates").in_("staff_id", list_of_staff_ids).eq("withdrawal_status", "pending").execute().data
+
+   return returned_result
