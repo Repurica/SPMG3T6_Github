@@ -46,7 +46,7 @@ const handleSubmit = (e) => {
     alert("Please select at least one date.");
   } 
   else if (reason.trim() === ''){
-    alert('Please enter a empty reason for request')
+    alert('Please enter a reason for request')
   }  
   else {
     handleApply(selectedDates); // Pass selected dates to handleApply
