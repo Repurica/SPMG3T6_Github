@@ -405,5 +405,23 @@ def validate_date_range(date1: str, date2: str) -> str:
     else:
         return "invalid"
 
+@application.route("/get_role", methods=['POST'])
+def get_role():
+    json_sent = request.get_json()
+    user_id = json_sent["user_id"]
+    password = json_sent["password"]
+    #json_sent = {"user_id": 140002, "password": "password"}
+    try:
+        response = supabase.table("users").select("*").eq("userid", user_id).eq("password", password).execute()
+        if(len(response.data)==0):
+            return {"error": "no matching user found"}, 200
+        
+        else:
+            role=supabase.table("employee").select("role").eq("staff_id", user_id).execute().data
+            role = role[0]["role"]
+            return {"role": role}, 200
+        
+    except Exception as e:
+        return {"info": repr(e)}, 500
 
    
