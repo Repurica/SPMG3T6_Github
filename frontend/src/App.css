@@ -18,6 +18,7 @@ body, html {
   list-style-type: none; 
   display: flex;         
   justify-content: center; 
+  align-items: center; /* Center items vertically */
   margin: 0;          
   padding: 0;          
 }
@@ -34,4 +35,16 @@ body, html {
 
 .navbar ul li a:hover {
   text-decoration: underline; 
+}
+
+.logout-button {
+  background: none;          /* Remove default button background */
+  border: none;             /* Remove border */
+  color: white;             /* Match link color */
+  padding: 0.5rem 1rem;     /* Match padding with links */
+  cursor: pointer;          /* Change cursor to pointer */
+}
+
+.logout-button:hover {
+  text-decoration: underline; /* Underline on hover, like links */
 }
