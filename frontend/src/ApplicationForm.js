@@ -35,9 +35,8 @@ function ApplicationForm() {
   const [checkFullDay, setCheckFullDay] = useState("");
   const [notification, setNotification] = useState('');
 
-  //temp staff id for now
 
-  const staffId = 140002
+  const staffId =  parseInt(sessionStorage.getItem('id'))
 
   // fetch data from application.py
   useEffect(() => {
