@@ -16,7 +16,7 @@ function ViewRequests() {
     const [notification, setNotification] = useState('');
 
     //const test_manager_id = 140894
-    const test_manager_id = 180001
+    const test_manager_id =  parseInt(sessionStorage.getItem('id'))
 
 
     const itemsPerPage = 3;
@@ -77,7 +77,7 @@ function ViewRequests() {
                 "outcome_reason" : reason      
              }         
              try {
-                const response = await fetch('http://localhost:5000/withdrawals/manager_approve_reject_withdrawal', {
+                const response = await fetch('http://localhost:5000/application/store_approval_rejection', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ function ViewRequests() {
                 "outcome_reason" : reason      
              }          
              try {
-                const response = await fetch('http://localhost:5000/withdrawals/manager_approve_reject_withdrawal', {
+                const response = await fetch('http://localhost:5000/application/store_approval_rejection', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

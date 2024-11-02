@@ -15,7 +15,7 @@ function WithdrawRequests() {
     const [loading, setLoading] = useState(true);
     const [notification, setNotification] = useState('');
 
-    const test_manager_id = 140894
+    const test_manager_id =  parseInt(sessionStorage.getItem('id'))
     //const test_manager_id = 180001
 
 
