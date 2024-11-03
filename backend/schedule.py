@@ -201,6 +201,8 @@ def get_team_schedules():
 
 
 
+
+
 @schedule.route('/all_schedules', methods=['GET'])
 def get_all_schedules():
     employee_data = supabase.table('employee') \
@@ -263,16 +265,15 @@ def get_all_schedules():
                             'reporting_manager': fetch_reporting_manager(employee['reporting_manager'])
                         })
 
-            all_schedules.append(schedules_list)
+            # Extend all_schedules with items from schedules_list instead of appending as a single list
+            all_schedules.extend(schedules_list)
+            
             all_staff_data.append({
                 'staff_name': f"{employee['staff_fname']} {employee['staff_lname']}",
-                'staff_id': employee['staff_id'],
-                'position': employee['position'],
-                'dept': employee['dept']
+                'staff_id': employee['staff_id']
             })
 
     return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})
 
 
-
-# #  test using http://127.0.0.1:5000/schedule/all_schedules
+#  test using http://127.0.0.1:5000/schedule/all_schedules
