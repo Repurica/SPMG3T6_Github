@@ -267,7 +267,9 @@ def get_all_schedules():
         all_schedules.extend(schedules_list)
         all_staff_data.append({
             'staff_name': f"{employee['staff_fname']} {employee['staff_lname']}",
-            'staff_id': staff_id
+            'staff_id': staff_id,
+            'position': employee['position'],
+            'dept': employee['dept'],
         })
 
     return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})
