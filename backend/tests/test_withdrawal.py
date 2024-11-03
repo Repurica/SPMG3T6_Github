@@ -91,22 +91,6 @@ def test_manager_view_withdrawals(mock_supabase):
     assert status_code == 200
     assert response.json[0]["staff_name"] == "John Doe"
 
-def test_store_outcome_withdrawal_manager(mock_supabase):
-    json_input = {
-        "outcome_status": "rejected",
-        "outcome_reason": "test reason",
-        "withdrawal_id": 1
-    }
-    # Mock withdrawal update response
-    mock_supabase["withdrawals"].update.return_value.eq.return_value.execute.return_value = {"status": "success"}
-    
-    with app.test_request_context(json=json_input):
-        with patch("flask.request.get_json", return_value=json_input):
-            response = store_outcome_withdrawal_manager()
-
-    assert response["status"] == "success"
-    assert "Withdrawal rejected successfully" in response["message"]
-
 
 def test_store_outcome_withdrawal_manager_rejection(mock_supabase):
     json_input = {
