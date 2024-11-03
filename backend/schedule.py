@@ -2,6 +2,7 @@
 
 
 
+
 from flask import Blueprint, request, jsonify
 from supabase_init import supabase
 from datetime import datetime, timedelta
@@ -32,6 +33,13 @@ def fetch_reporting_manager(reporting_manager_id):
         return f"{manager_data.data[0]['staff_fname']} {manager_data.data[0]['staff_lname']}"
     return "No reporting manager found"
 
+# Mapping for WFH wording conversion
+wfh_wording = {
+    "AM": "AM WFH",
+    "PM": "PM WFH",
+    "full_day": "Full Day WFH"
+}
+
 @schedule.route('/staff_schedules', methods=['GET'])
 def get_staff_schedules():
     staff_id = request.args.get('staff_id')
@@ -51,7 +59,7 @@ def get_staff_schedules():
     time_ranges = {
         'AM': ("09:00:00", "13:00:00"),
         'PM': ("14:00:00", "18:00:00"),
-        'Whole day': ("09:00:00", "18:00:00"),
+        'full_day': ("09:00:00", "18:00:00"),
         'in_office': ("09:00:00", "18:00:00")
     }
 
@@ -69,6 +77,9 @@ def get_staff_schedules():
         for day, offset in day_offsets.items():
             wfh_status = schedule.get(day)
             if wfh_status and wfh_status != "in_office":
+                # Convert wfh_status to the desired wording
+                wfh_display = wfh_wording.get(wfh_status, wfh_status)
+                
                 start_time, end_time = time_ranges.get(wfh_status, ("09:00:00", "18:00:00"))
                 day_date = starting_date + timedelta(days=offset)
                 start_date_str = f"{day_date.strftime('%Y-%m-%d')}T{start_time}+08:00"
@@ -80,7 +91,7 @@ def get_staff_schedules():
                     'position': staff_data.data[0]['position'],
                     'startDate': datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
                     'endDate': datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
-                    'wfh': wfh_status,
+                    'wfh': wfh_display,
                     'reporting_manager': reporting_manager_name
                 })
 
@@ -90,6 +101,7 @@ def get_staff_schedules():
     }]
 
     return jsonify({"schedules": schedules_list, "staff_data": staff_info})
+
 
 
 
@@ -120,11 +132,17 @@ def get_team_schedules():
     if not team_members.data:
         return jsonify({"error": "No team members found for this reporting manager."}), 404
 
+    # Define time ranges and WFH status mappings
     time_ranges = {
         'AM': ("09:00:00", "13:00:00"),
         'PM': ("14:00:00", "18:00:00"),
-        'Whole day': ("09:00:00", "18:00:00"),
+        'full_day': ("09:00:00", "18:00:00"),
         'in_office': ("09:00:00", "18:00:00")
+    }
+    wfh_status_mappings = {
+        'AM': "AM WFH",
+        'PM': "PM WFH",
+        'full_day': "Full Day WFH"
     }
 
     day_offsets = {
@@ -143,7 +161,6 @@ def get_team_schedules():
         schedules = fetch_schedules(member_id)
 
         if schedules.data:
-            schedules_list = []
             for schedule in schedules.data:
                 starting_date = datetime.strptime(schedule['starting_date'], '%Y-%m-%d')
                 for day, offset in day_offsets.items():
@@ -154,17 +171,19 @@ def get_team_schedules():
                         start_date_str = f"{day_date.strftime('%Y-%m-%d')}T{start_time}+08:00"
                         end_date_str = f"{day_date.strftime('%Y-%m-%d')}T{end_time}+08:00"
 
-                        schedules_list.append({
+                        # Map the WFH status to the appropriate wording
+                        formatted_wfh_status = wfh_status_mappings.get(wfh_status, wfh_status)
+
+                        all_schedules.append({
                             'staff_id': member['staff_id'],
                             'dept': member['dept'],
                             'position': member['position'],
                             'startDate': datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
                             'endDate': datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
-                            'wfh': wfh_status,
+                            'wfh': formatted_wfh_status,
                             'reporting_manager': reporting_manager_name
                         })
 
-            all_schedules.append(schedules_list)
             all_staff_data.append({
                 'staff_name': f"{member['staff_fname']} {member['staff_lname']}",
                 'staff_id': member['staff_id']
@@ -173,10 +192,7 @@ def get_team_schedules():
     return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})
 
 
-
-# test http://127.0.0.1:5000/schedule/team_schedules?staff_id=140003
-
-
+# # test http://127.0.0.1:5000/schedule/team_schedules?staff_id=140003
 
 
 
@@ -194,11 +210,17 @@ def get_all_schedules():
     all_schedules = []
     all_staff_data = []
 
+    # Define time ranges and WFH status mappings
     time_ranges = {
         'AM': ("09:00:00", "13:00:00"),
         'PM': ("14:00:00", "18:00:00"),
-        'Whole day': ("09:00:00", "18:00:00"),
+        'full_day': ("09:00:00", "18:00:00"),
         'in_office': ("09:00:00", "18:00:00")
+    }
+    wfh_status_mappings = {
+        'AM': "AM WFH",
+        'PM': "PM WFH",
+        'full_day': "Full Day WFH"
     }
 
     day_offsets = {
@@ -225,13 +247,16 @@ def get_all_schedules():
                         start_date_str = f"{day_date.strftime('%Y-%m-%d')}T{start_time}+08:00"
                         end_date_str = f"{day_date.strftime('%Y-%m-%d')}T{end_time}+08:00"
 
+                        # Map the WFH status to the appropriate wording
+                        formatted_wfh_status = wfh_status_mappings.get(wfh_status, wfh_status)
+
                         schedules_list.append({
                             'staff_id': member_id,
                             'dept': employee['dept'],
                             'position': employee['position'],
                             'startDate': datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
                             'endDate': datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
-                            'wfh': wfh_status,
+                            'wfh': formatted_wfh_status,
                             'reporting_manager': fetch_reporting_manager(employee['reporting_manager'])
                         })
 
@@ -245,4 +270,4 @@ def get_all_schedules():
 
 
 
-#  test using http://127.0.0.1:5000/schedule/all_schedules
+# #  test using http://127.0.0.1:5000/schedule/all_schedules
