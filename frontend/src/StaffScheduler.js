@@ -35,36 +35,39 @@ function StaffScheduler() {
 
     useEffect(() => {
         const fetchSchedules = async () => {
-            try {
-                let ownResponse;
-
-                if (role === '1') {
-                    ownResponse = await fetchWithRetry('http://127.0.0.1:5000/schedule/all_schedules', {
+            try {                
+                const url = `http://127.0.0.1:5000/schedule/staff_schedules?staff_id=${id}`;
+                const ownResponse = await fetchWithRetry(url, {
                         method: 'GET'
                     }, 3, 1000);  // 3 retries with a 1 second delay
-                } else {
-                    const url = `http://127.0.0.1:5000/schedule/staff_schedules?staff_id=${id}`;
-                    ownResponse = await fetchWithRetry(url, {
-                        method: 'GET'
-                    }, 3, 1000);  // 3 retries with a 1 second delay                   
-                }
                 const ownData = await ownResponse.json();   // Parse JSON data
                 setOwnSchedule(ownData.schedules); 
+            } catch (error) {
+                console.log('Error fetching own schedules:', error.message);
+            }
 
-                const teamResponse = await fetchWithRetry('http://127.0.0.1:5000/schedule/team_schedules?staff_id=140002', {
-                    method: 'GET'
-                }, 3, 1000);  // Fetch Team Schedule
+            try {
+                let teamResponse;
+                if (role === '1') {
+                    teamResponse = await fetchWithRetry('http://127.0.0.1:5000/schedule/all_schedules', {
+                        method: 'GET'
+                    }, 3, 1000);  // Fetch Team Schedule
+                } else {
+                    const url = `http://127.0.0.1:5000/schedule/team_schedules?staff_id=${id}`;
+                    teamResponse = await fetchWithRetry(url, {
+                            method: 'GET'
+                        }, 3, 1000);  // 3 retries with a 1 second delay
+                }
                 const teamData = await teamResponse.json();
                 setTeamSchedule(teamData.schedules);  
                 setStaffData(teamData.staff_data);  
-                // console.log(staffData)
                 console.log(teamSchedule)
             } catch (error) {
-                console.log(error.message);
+                console.log('Error fetching own schedules:', error.message);
             }
         };
         fetchSchedules();
-    }, []);
+    }, [id]);
 
     useEffect(() => {
     //   const currentDate = new Date();
@@ -92,7 +95,8 @@ function StaffScheduler() {
             && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0));  // show only schedules 2m back, 3m forward
         } else if (currentResource === 'Team Schedule') {
             schedule = teamSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0) 
-            && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0));
+            && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0))
+            .filter(item => item.staff_id === id);
         }
 
         if (selectedDept === 'All') {
@@ -105,10 +109,14 @@ function StaffScheduler() {
     const getStaff = () => {
         let staff
 
-        staff = staffData.map(item => ({  
+        staff = staffData
+        .filter(item => item.staff_id !== Number(id))
+        .map(item => ({  
             ...item,
             staff_display: `${item.staff_name} (${item.position})`
           }));
+
+        console.log(staff)
 
         if (selectedDept === 'All') {
             return staff
@@ -141,16 +149,18 @@ function StaffScheduler() {
                     </div>
                 )}
 
-                <div className="dept">
-                    Filter Department:
-                    <SelectBox
-                        items={deptList}
-                        value={selectedDept}
-                        onValueChanged={handleSelectionChange}
-                        placeholder="All"
-                        searchEnabled={true}
-                    />
-                </div>
+                {role === '1' && currentResource === 'Team Schedule' && (
+                    <div className="dept">
+                        Filter Department:
+                        <SelectBox
+                            items={deptList}
+                            value={selectedDept}
+                            onValueChanged={handleSelectionChange}
+                            placeholder="All"
+                            searchEnabled={true}
+                        />
+                    </div>
+                )}
 
                 <div className="option">
                     <RadioGroup
