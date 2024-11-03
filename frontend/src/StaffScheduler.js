@@ -95,7 +95,8 @@ function StaffScheduler() {
             && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0));  // show only schedules 2m back, 3m forward
         } else if (currentResource === 'Team Schedule') {
             schedule = teamSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0) 
-            && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0));
+            && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0))
+            .filter(item => item.staff_id === id);
         }
 
         if (selectedDept === 'All') {
@@ -108,10 +109,14 @@ function StaffScheduler() {
     const getStaff = () => {
         let staff
 
-        staff = staffData.map(item => ({  
+        staff = staffData
+        .filter(item => item.staff_id !== Number(id))
+        .map(item => ({  
             ...item,
             staff_display: `${item.staff_name} (${item.position})`
           }));
+
+        console.log(staff)
 
         if (selectedDept === 'All') {
             return staff
