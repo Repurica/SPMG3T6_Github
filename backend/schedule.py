@@ -19,10 +19,7 @@ def fetch_employee_details(staff_id):
 
 # Helper function to fetch schedules for an employee
 def fetch_schedules(staff_id):
-    return supabase.table('schedule') \
-        .select("*") \
-        .eq('staff_id', staff_id) \
-        .execute()
+    return supabase.table('schedule').select("*") .eq('staff_id', staff_id).execute()
 
 # Helper function to fetch reporting manager's name
 def fetch_reporting_manager(reporting_manager_id):
@@ -205,75 +202,76 @@ def get_team_schedules():
 
 @schedule.route('/all_schedules', methods=['GET'])
 def get_all_schedules():
-    employee_data = supabase.table('employee') \
-        .select('staff_fname, staff_lname, staff_id, position, role, dept, reporting_manager') \
-        .execute()
+    # Fetch employee and schedule data in batch
+    employee_data = supabase.table('employee').select(
+        'staff_fname, staff_lname, staff_id, position, role, dept, reporting_manager'
+    ).execute()
 
-    if not employee_data.data or len(employee_data.data) == 0:
+    schedule_data = supabase.table('schedule').select('*').execute()  # Assume all schedules fetched in one go
+    if not employee_data.data:
         return jsonify({"error": "No employees found."}), 404
 
-    all_schedules = []
-    all_staff_data = []
-
-    # Define time ranges and WFH status mappings
+    # Setup mappings
     time_ranges = {
         'AM': ("09:00:00", "13:00:00"),
         'PM': ("14:00:00", "18:00:00"),
-        'full_day': ("09:00:00", "18:00:00"),
-        'in_office': ("09:00:00", "18:00:00")
+        'full_day': ("09:00:00", "18:00:00")
     }
     wfh_status_mappings = {
         'AM': "AM WFH",
         'PM': "PM WFH",
         'full_day': "Full Day WFH"
     }
+    day_offsets = {'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3, 'friday': 4}
 
-    day_offsets = {
-        'monday': 0,
-        'tuesday': 1,
-        'wednesday': 2,
-        'thursday': 3,
-        'friday': 4,
-    }
+    # Preprocess employees and schedules
+    # Assuming each `staff_id` may have multiple schedules, store schedules in a list for each staff_id
+    schedule_map = {}
+    for sch in schedule_data.data:
+        staff_id = sch['staff_id']
+        if staff_id not in schedule_map:
+            schedule_map[staff_id] = []
+        schedule_map[staff_id].append(sch)
+
+    all_schedules = []
+    all_staff_data = []
 
     for employee in employee_data.data:
-        member_id = employee['staff_id']
-        schedules = fetch_schedules(member_id)
-
-        if schedules.data:
-            schedules_list = []
-            for schedule in schedules.data:
-                starting_date = datetime.strptime(schedule['starting_date'], '%Y-%m-%d')
-                for day, offset in day_offsets.items():
-                    wfh_status = schedule.get(day)
-                    if wfh_status and wfh_status != "in_office":
-                        start_time, end_time = time_ranges.get(wfh_status, ("09:00:00", "18:00:00"))
-                        day_date = starting_date + timedelta(days=offset)
-                        start_date_str = f"{day_date.strftime('%Y-%m-%d')}T{start_time}+08:00"
-                        end_date_str = f"{day_date.strftime('%Y-%m-%d')}T{end_time}+08:00"
-
-                        # Map the WFH status to the appropriate wording
-                        formatted_wfh_status = wfh_status_mappings.get(wfh_status, wfh_status)
-
-                        schedules_list.append({
-                            'staff_id': member_id,
-                            'dept': employee['dept'],
-                            'position': employee['position'],
-                            'startDate': datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
-                            'endDate': datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
-                            'wfh': formatted_wfh_status,
-                            'reporting_manager': fetch_reporting_manager(employee['reporting_manager'])
-                        })
-
-            # Extend all_schedules with items from schedules_list instead of appending as a single list
-            all_schedules.extend(schedules_list)
+        staff_id = employee['staff_id']
+        schedules = schedule_map.get(staff_id, [])
+        
+        schedules_list = []
+        
+        # Iterate over each schedule entry for the staff member
+        for schedule in schedules:
+            starting_date = datetime.strptime(schedule['starting_date'], '%Y-%m-%d')
             
-            all_staff_data.append({
-                'staff_name': f"{employee['staff_fname']} {employee['staff_lname']}",
-                'staff_id': employee['staff_id']
-            })
+            for day, offset in day_offsets.items():
+                wfh_status = schedule.get(day)
+                if wfh_status and wfh_status != "in_office":
+                    start_time, end_time = time_ranges.get(wfh_status, ("09:00:00", "18:00:00"))
+                    day_date = starting_date + timedelta(days=offset)
+                    start_date_str = f"{day_date.strftime('%Y-%m-%d')}T{start_time}+08:00"
+                    end_date_str = f"{day_date.strftime('%Y-%m-%d')}T{end_time}+08:00"
+                    
+                    schedules_list.append({
+                        'staff_id': staff_id,
+                        'dept': employee['dept'],
+                        'position': employee['position'],
+                        'startDate': start_date_str,
+                        'endDate': end_date_str,
+                        'wfh': wfh_status_mappings.get(wfh_status, wfh_status),
+                        'reporting_manager': fetch_reporting_manager(employee['reporting_manager'])
+                    })
+
+        all_schedules.extend(schedules_list)
+        all_staff_data.append({
+            'staff_name': f"{employee['staff_fname']} {employee['staff_lname']}",
+            'staff_id': staff_id
+        })
 
     return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})
+
 
 
 #  test using http://127.0.0.1:5000/schedule/all_schedules
