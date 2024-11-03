@@ -161,7 +161,6 @@ def get_team_schedules():
         schedules = fetch_schedules(member_id)
 
         if schedules.data:
-            schedules_list = []
             for schedule in schedules.data:
                 starting_date = datetime.strptime(schedule['starting_date'], '%Y-%m-%d')
                 for day, offset in day_offsets.items():
@@ -175,7 +174,7 @@ def get_team_schedules():
                         # Map the WFH status to the appropriate wording
                         formatted_wfh_status = wfh_status_mappings.get(wfh_status, wfh_status)
 
-                        schedules_list.append({
+                        all_schedules.append({
                             'staff_id': member['staff_id'],
                             'dept': member['dept'],
                             'position': member['position'],
@@ -185,7 +184,6 @@ def get_team_schedules():
                             'reporting_manager': reporting_manager_name
                         })
 
-            all_schedules.append(schedules_list)
             all_staff_data.append({
                 'staff_name': f"{member['staff_fname']} {member['staff_lname']}",
                 'staff_id': member['staff_id']
@@ -194,10 +192,7 @@ def get_team_schedules():
     return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})
 
 
-# test http://127.0.0.1:5000/schedule/team_schedules?staff_id=140003
-
-
-
+# # test http://127.0.0.1:5000/schedule/team_schedules?staff_id=140003
 
 
 
