@@ -1,4 +1,5 @@
 # # # 14-10 HT edited time_ranges
+# # # 3-11 HT added position and dept to return format of team_schedules and all_schedules
 
 
 
@@ -186,7 +187,9 @@ def get_team_schedules():
 
             all_staff_data.append({
                 'staff_name': f"{member['staff_fname']} {member['staff_lname']}",
-                'staff_id': member['staff_id']
+                'staff_id': member['staff_id'],
+                'position': member['position'],
+                'dept': member['dept']
             })
 
     return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})
@@ -264,6 +267,8 @@ def get_all_schedules():
             all_staff_data.append({
                 'staff_name': f"{employee['staff_fname']} {employee['staff_lname']}",
                 'staff_id': employee['staff_id']
+                'position': member['position'],
+                'dept': member['dept']
             })
 
     return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Scheduler, View, Resource } from 'devextreme-react/scheduler';
 import { fetchWithRetry } from './FetchWithRetry';
 import RadioGroup from 'devextreme-react/radio-group';
+import SelectBox from 'devextreme-react/select-box';
 
 function StaffScheduler() {
     const [ownSchedule, setOwnSchedule] = useState([]);  
@@ -12,10 +13,19 @@ function StaffScheduler() {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
 
+    const id = sessionStorage.getItem('id');
+    const role = sessionStorage.getItem('role');
+
     const resourcesList = ['Own Schedule', 'Team Schedule'];
     const [currentResource, setCurrentResource] = useState(resourcesList[0]);
     const onRadioGroupValueChanged = useCallback((e) => {
-      setCurrentResource(e.value);
+        setCurrentResource(e.value);
+    }, []);
+
+    const deptList = ['All', 'Sales', 'Engineering', 'HR', 'Finance', 'Consultancy', 'Solutioning', 'IT']
+    const [selectedDept, setSelectedDept] = useState('All');
+    const handleSelectionChange = useCallback((e) => {
+        setSelectedDept(e.value);
     }, []);
 
     const [currentView, setCurrentView] = useState('Day');
@@ -26,9 +36,18 @@ function StaffScheduler() {
     useEffect(() => {
         const fetchSchedules = async () => {
             try {
-                const ownResponse = await fetchWithRetry('http://127.0.0.1:5000/schedule/staff_schedules?staff_id=140002', {
-                    method: 'GET'
-                }, 3, 1000);  // 3 retries with a 1 second delay
+                let ownResponse;
+
+                if (role === '1') {
+                    ownResponse = await fetchWithRetry('http://127.0.0.1:5000/schedule/all_schedules', {
+                        method: 'GET'
+                    }, 3, 1000);  // 3 retries with a 1 second delay
+                } else {
+                    const url = `http://127.0.0.1:5000/schedule/staff_schedules?staff_id=${id}`;
+                    ownResponse = await fetchWithRetry(url, {
+                        method: 'GET'
+                    }, 3, 1000);  // 3 retries with a 1 second delay                   
+                }
                 const ownData = await ownResponse.json();   // Parse JSON data
                 setOwnSchedule(ownData.schedules); 
 
@@ -66,25 +85,50 @@ function StaffScheduler() {
 
     // Choose own/team schedules based on current resource selection
     const getSchedule = () => {
+        let schedule
+
         if (currentResource === 'Own Schedule') {
-            const schedule = ownSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0)
+            schedule = ownSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0)
             && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0));  // show only schedules 2m back, 3m forward
-
-            // Format schedule display text
-            return schedule.map(item => ({
-                ...item,
-                wfhText: `${item.wfh} WFH`
-            }));
         } else if (currentResource === 'Team Schedule') {
-            const schedule = teamSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0) 
+            schedule = teamSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0) 
             && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0));
-
-            return schedule.map(item => ({
-                ...item,
-                wfhText: `${item.wfh} WFH`
-            }));
         }
-        return [];
+
+        if (selectedDept === 'All') {
+            return schedule
+        } else {
+            return schedule.filter(item => item.dept === selectedDept)
+        }
+    };
+
+    const getStaff = () => {
+        let staff
+
+        staff = staffData.map(item => ({  
+            ...item,
+            staff_display: `${item.staff_name} (${item.position})`
+          }));
+
+        if (selectedDept === 'All') {
+            return staff
+        } else {
+            return staff.filter(item => item.dept === selectedDept)
+        }
+    }
+
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const handleDateChange = (newDate) => {
+        setSelectedDate(newDate);
+        console.log(newDate)
+    };
+
+    const isSameDay = (date1, date2) => {
+        return (
+            date1.getFullYear() === date2.getFullYear() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getDate() === date2.getDate()
+        );
     };
 
     return (
@@ -92,10 +136,22 @@ function StaffScheduler() {
             <div className="utility">
                 {currentView === 'Day' && currentResource === 'Team Schedule' && (
                     <div className="ppl_count">
-                        <p>AM Count: {getSchedule().filter(item => item.wfh === 'AM').length} In Office, {staffData.length} WFH</p>
-                        <p>PM Count: {staffData.length} In Office, {staffData.length} WFH</p>
+                        <p>AM Count: {getStaff().length - getSchedule().filter(item => (item.wfh === 'AM WFH' || item.wfh === 'Full Day WFH') && isSameDay(selectedDate, new Date(item.startDate))).length} In Office, {getSchedule().filter(item => (item.wfh === 'AM WFH' || item.wfh === 'Full Day WFH') && isSameDay(selectedDate, new Date(item.startDate))).length} WFH</p>
+                        <p>PM Count: {getStaff().length - getSchedule().filter(item => (item.wfh === 'PM WFH' || item.wfh === 'Full Day WFH') && isSameDay(selectedDate, new Date(item.startDate))).length} In Office, {getSchedule().filter(item => (item.wfh === 'PM WFH' || item.wfh === 'Full Day WFH') && isSameDay(selectedDate, new Date(item.startDate))).length} WFH</p>
                     </div>
                 )}
+
+                <div className="dept">
+                    Filter Department:
+                    <SelectBox
+                        items={deptList}
+                        value={selectedDept}
+                        onValueChanged={handleSelectionChange}
+                        placeholder="All"
+                        searchEnabled={true}
+                    />
+                </div>
+
                 <div className="option">
                     <RadioGroup
                         items={resourcesList}
@@ -104,6 +160,10 @@ function StaffScheduler() {
                         onValueChanged={onRadioGroupValueChanged}
                     />
                 </div>
+
+                <div className="dept">
+
+                </div>
             </div>
             <Scheduler id='scheduler'
                 dataSource={getSchedule()}
@@ -111,7 +171,7 @@ function StaffScheduler() {
                 firstDayOfWeek={1}
                 startDayHour={9}
                 endDayHour={18}
-                textExpr='wfhText'
+                textExpr='wfh'
                 defaultCurrentView="timelineDay"
                 min={startDate}
                 max={endDate}
@@ -119,6 +179,7 @@ function StaffScheduler() {
                 onCurrentViewChange={(view) => {
                     setCurrentView(view)
                 }}
+                onCurrentDateChange={handleDateChange}
                 maxAppointmentsPerCell={'unlimited'}
                 editing={false}
                 crossScrollingEnabled={true}>
@@ -137,13 +198,23 @@ function StaffScheduler() {
                 />
 
                 <Resource
+                    fieldExpr="wfh"
+                    dataSource={[
+                        { id: 'AM WFH', text: 'AM WFH', color: '#76C1FA' },
+                        { id: 'PM WFH', text: 'WFH PM', color: '#FF8C00' },
+                        { id: 'Full Day WFH', text: 'Full Day WFH', color: '#8000FC' }
+                    ]}
+                    label="WFH Status"
+                    useColorAsDefault={true}
+                />
+
+                <Resource
                     fieldExpr='staff_id'
-                    dataSource={currentResource === 'Team Schedule' ? staffData : []}
+                    dataSource={currentResource === 'Team Schedule' ? getStaff() : []}
                     label="Staff"
                     valueExpr='staff_id'
-                    displayExpr='staff_name'
+                    displayExpr='staff_display'
                     useColorAsDefault={true}
-                    // useColorAsDefault={currentResource === 'Room'} need add colour attribute
                 />
             </Scheduler>
         </React.Fragment>
