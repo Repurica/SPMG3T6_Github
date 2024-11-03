@@ -1,0 +1,56 @@
+[
+    {
+        "application_id": 4,
+        "reason": "test",
+        "staff_id": 140003,
+        "staff_name": "Janice Chan",
+        "wfh_timing": "AM",
+        "withdrawal_id": 2,
+        "withdrawn_dates": {
+            "dates": [
+                "2024-10-11"
+            ]
+        }
+    },
+    {
+        "application_id": 4,
+        "reason": "test 2",
+        "staff_id": 140003,
+        "staff_name": "Janice Chan",
+        "wfh_timing": "AM",
+        "withdrawal_id": 3,
+        "withdrawn_dates": {
+            "dates": [
+                "2024-10-18"
+            ]
+        }
+    },
+    {
+        "application_id": 18,
+        "reason": "test",
+        "staff_id": 140002,
+        "staff_name": "Susan Goh",
+        "wfh_timing": "full_day",
+        "withdrawal_id": 4,
+        "withdrawn_dates": {
+            "dates": [
+                "2024-10-16",
+                "2024-10-23"
+            ]
+        }
+    },
+    {
+        "application_id": 18,
+        "reason": "test1",
+        "staff_id": 140002,
+        "staff_name": "Susan Goh",
+        "wfh_timing": "full_day",
+        "withdrawal_id": 7,
+        "withdrawn_dates": {
+            "dates": [
+                "2024-10-23",
+                "2024-10-16"
+            ]
+        }
+    }
+]

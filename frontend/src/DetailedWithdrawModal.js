@@ -12,8 +12,8 @@ const DetailedWithdrawModal = ({ isOpen, selectedItem, reason, setReason, handle
         <button className="close-btn" onClick={handleClose}>X</button>
         <h2>Request Details</h2>
         <p><strong>Staff Name:</strong> {selectedItem.staff_name}</p>
-        <p><strong>Position ID:</strong> {selectedItem.staff_id}</p>
-        <p><strong>Dates to withdraw:</strong> {selectedItem.withdrawn_dates.dates.join(", ")}</p>
+        <p><strong>Staff ID:</strong> {selectedItem.staff_id}</p>
+        <p><strong>Dates to Withdraw:</strong> {selectedItem.withdrawn_dates.dates.join(", ")}</p>
 
         <p><strong>Timing:</strong> {selectedItem.wfh_timing === 'full_day' ? 'Full Day' : selectedItem.wfh_timing}</p>
         <div className="reason-box">

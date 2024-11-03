@@ -1,0 +1,86 @@
+{
+    "3": {
+        "application_id": 3,
+        "capacity": "valid",
+        "created_at": "2024-10-12",
+        "end_date": null,
+        "reason": "test1",
+        "request_type": "ad_hoc",
+        "staff_fullname": "Susan Goh",
+        "staff_id": 140002,
+        "starting_date": "2024-10-09",
+        "timing": "PM"
+    },
+    "4": {
+        "application_id": 4,
+        "capacity": "valid",
+        "created_at": "2024-10-12",
+        "end_date": "2024-10-25",
+        "reason": "test2 another staff_id",
+        "request_type": "recurring",
+        "staff_fullname": "Janice Chan",
+        "staff_id": 140003,
+        "starting_date": "2024-10-11",
+        "timing": "AM"
+    },
+    "5": {
+        "application_id": 5,
+        "capacity": "invalid",
+        "created_at": "2024-10-12",
+        "end_date": null,
+        "reason": "test3",
+        "request_type": "ad_hoc",
+        "staff_fullname": "Janice Chan",
+        "staff_id": 140003,
+        "starting_date": "2024-10-16",
+        "timing": "PM"
+    },
+    "12": {
+        "application_id": 12,
+        "capacity": "valid",
+        "created_at": "2024-10-19",
+        "end_date": null,
+        "reason": "i need to wfh",
+        "request_type": "ad_hoc",
+        "staff_fullname": "Susan Goh",
+        "staff_id": 140002,
+        "starting_date": "2024-10-17",
+        "timing": "full_day"
+    },
+    "13": {
+        "application_id": 13,
+        "capacity": "invalid",
+        "created_at": "2024-10-19",
+        "end_date": null,
+        "reason": "i need to wfh",
+        "request_type": "ad_hoc",
+        "staff_fullname": "Susan Goh",
+        "staff_id": 140002,
+        "starting_date": "2024-10-11",
+        "timing": "AM"
+    },
+    "16": {
+        "application_id": 16,
+        "capacity": "valid",
+        "created_at": "2024-10-22",
+        "end_date": null,
+        "reason": "testing new function",
+        "request_type": "ad_hoc",
+        "staff_fullname": "Susan Goh",
+        "staff_id": 140002,
+        "starting_date": "2024-10-15",
+        "timing": "AM"
+    },
+    "17": {
+        "application_id": 17,
+        "capacity": "valid",
+        "created_at": "2024-10-22",
+        "end_date": "2024-10-14",
+        "reason": "testing recurring",
+        "request_type": "recurring",
+        "staff_fullname": "Susan Goh",
+        "staff_id": 140002,
+        "starting_date": "2024-10-07",
+        "timing": "full_day"
+    }
+}

@@ -1,0 +1,179 @@
+{
+    "2": {
+        "applied_dates": {
+            "dates": []
+        },
+        "created_at": "2024-10-12",
+        "end_date": null,
+        "outcome_reason": null,
+        "pending_withdrawal_dates": [],
+        "reason": "test reason 3\r\n\r\n\r\n",
+        "request_type": "ad_hoc",
+        "staff_id": 140002,
+        "starting_date": "2024-10-09",
+        "status": "withdrawn",
+        "timing": "AM",
+        "validity_of_withdrawal": "valid"
+    },
+    "3": {
+        "applied_dates": {
+            "dates": [
+                "2024-10-09"
+            ]
+        },
+        "created_at": "2024-10-12",
+        "end_date": null,
+        "outcome_reason": null,
+        "pending_withdrawal_dates": [],
+        "reason": "test1",
+        "request_type": "ad_hoc",
+        "staff_id": 140002,
+        "starting_date": "2024-10-09",
+        "status": "pending",
+        "timing": "PM",
+        "validity_of_withdrawal": "valid"
+    },
+    "7": {
+        "applied_dates": {
+            "dates": [
+                "2024-10-08"
+            ]
+        },
+        "created_at": "2024-10-16",
+        "end_date": null,
+        "outcome_reason": null,
+        "pending_withdrawal_dates": [],
+        "reason": "aa",
+        "request_type": "ad_hoc",
+        "staff_id": 140002,
+        "starting_date": "2024-10-10",
+        "status": "rejected",
+        "timing": "full_day",
+        "validity_of_withdrawal": "valid"
+    },
+    "8": {
+        "applied_dates": {
+            "dates": [
+                "2024-10-08"
+            ]
+        },
+        "created_at": "2024-10-16",
+        "end_date": null,
+        "outcome_reason": "?",
+        "pending_withdrawal_dates": [],
+        "reason": "aa",
+        "request_type": "ad_hoc",
+        "staff_id": 140002,
+        "starting_date": "2024-10-08",
+        "status": "approved",
+        "timing": "full_day",
+        "validity_of_withdrawal": "valid"
+    },
+    "9": {
+        "applied_dates": {
+            "dates": [
+                "2024-10-14"
+            ]
+        },
+        "created_at": "2024-10-16",
+        "end_date": null,
+        "outcome_reason": null,
+        "pending_withdrawal_dates": [],
+        "reason": "qwert",
+        "request_type": "ad_hoc",
+        "staff_id": 140002,
+        "starting_date": "2024-10-14",
+        "status": "rejected",
+        "timing": "PM",
+        "validity_of_withdrawal": "valid"
+    },
+    "12": {
+        "applied_dates": {
+            "dates": [
+                "2024-10-17"
+            ]
+        },
+        "created_at": "2024-10-19",
+        "end_date": null,
+        "outcome_reason": null,
+        "pending_withdrawal_dates": [],
+        "reason": "i need to wfh",
+        "request_type": "ad_hoc",
+        "staff_id": 140002,
+        "starting_date": "2024-10-17",
+        "status": "pending",
+        "timing": "full_day",
+        "validity_of_withdrawal": "valid"
+    },
+    "13": {
+        "applied_dates": {
+            "dates": [
+                "2024-10-11"
+            ]
+        },
+        "created_at": "2024-10-19",
+        "end_date": null,
+        "outcome_reason": null,
+        "pending_withdrawal_dates": [],
+        "reason": "i need to wfh",
+        "request_type": "ad_hoc",
+        "staff_id": 140002,
+        "starting_date": "2024-10-11",
+        "status": "pending",
+        "timing": "AM",
+        "validity_of_withdrawal": "valid"
+    },
+    "16": {
+        "applied_dates": {
+            "dates": [
+                "2024-10-15"
+            ]
+        },
+        "created_at": "2024-10-22",
+        "end_date": null,
+        "outcome_reason": null,
+        "pending_withdrawal_dates": [],
+        "reason": "testing new function",
+        "request_type": "ad_hoc",
+        "staff_id": 140002,
+        "starting_date": "2024-10-15",
+        "status": "pending",
+        "timing": "AM",
+        "validity_of_withdrawal": "valid"
+    },
+    "17": {
+        "applied_dates": {
+            "dates": [
+                "2024-10-07",
+                "2024-10-14"
+            ]
+        },
+        "created_at": "2024-10-22",
+        "end_date": "2024-10-14",
+        "outcome_reason": null,
+        "pending_withdrawal_dates": [],
+        "reason": "testing recurring",
+        "request_type": "recurring",
+        "staff_id": 140002,
+        "starting_date": "2024-10-07",
+        "status": "pending",
+        "timing": "full_day",
+        "validity_of_withdrawal": "valid"
+    },
+    "18": {
+        "applied_dates": {
+            "dates": []
+        },
+        "created_at": "2024-10-27",
+        "end_date": "2024-10-23",
+        "outcome_reason": null,
+        "pending_withdrawal_dates": [],
+        "reason": "testing accepted",
+        "request_type": "recurring",
+        "staff_id": 140002,
+        "starting_date": "2024-10-16",
+        "status": "withdrawn",
+        "timing": "full_day",
+        "validity_of_withdrawal": "valid"
+    }
+}
