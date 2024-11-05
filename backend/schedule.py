@@ -153,7 +153,6 @@ def get_team_schedules():
                         all_schedules.append({
                             'staff_id': member['staff_id'],
                             'dept': member['dept'],
-                            'position': member['position'],
                             'startDate': datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
                             'endDate': datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
                             'wfh': formatted_wfh_status
