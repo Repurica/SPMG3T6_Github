@@ -1,6 +1,5 @@
-# # # 14-10 HT edited time_ranges
-# # # 3-11 HT added position and dept to return format of team_schedules and all_schedules
-
+# # # # 14-10 HT edited time_ranges
+# # # # 3-11 HT added position and dept to return format of team_schedules and all_schedules
 
 
 
@@ -19,17 +18,7 @@ def fetch_employee_details(staff_id):
 
 # Helper function to fetch schedules for an employee
 def fetch_schedules(staff_id):
-    return supabase.table('schedule').select("*") .eq('staff_id', staff_id).execute()
-
-# Helper function to fetch reporting manager's name
-def fetch_reporting_manager(reporting_manager_id):
-    manager_data = supabase.table('employee') \
-        .select('staff_fname, staff_lname') \
-        .eq('staff_id', reporting_manager_id) \
-        .execute()
-    if manager_data.data:
-        return f"{manager_data.data[0]['staff_fname']} {manager_data.data[0]['staff_lname']}"
-    return "No reporting manager found"
+    return supabase.table('schedule').select("*").eq('staff_id', staff_id).execute()
 
 # Mapping for WFH wording conversion
 wfh_wording = {
@@ -45,9 +34,6 @@ def get_staff_schedules():
 
     if not staff_data.data:
         return jsonify({"error": "No staff found with this ID."}), 404
-
-    reporting_manager_id = staff_data.data[0]['reporting_manager']
-    reporting_manager_name = fetch_reporting_manager(reporting_manager_id)
 
     schedules = fetch_schedules(staff_id)
 
@@ -89,8 +75,7 @@ def get_staff_schedules():
                     'position': staff_data.data[0]['position'],
                     'startDate': datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
                     'endDate': datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
-                    'wfh': wfh_display,
-                    'reporting_manager': reporting_manager_name
+                    'wfh': wfh_display
                 })
 
     staff_info = [{
@@ -99,12 +84,6 @@ def get_staff_schedules():
     }]
 
     return jsonify({"schedules": schedules_list, "staff_data": staff_info})
-
-
-
-
-
-# test http://127.0.0.1:5000/schedule/staff_schedules?staff_id=140003
 
 
 
@@ -120,7 +99,6 @@ def get_team_schedules():
         return jsonify({"error": "No staff found with this ID."}), 404
 
     reporting_manager_id = staff_data.data[0]['reporting_manager']
-    reporting_manager_name = fetch_reporting_manager(reporting_manager_id)
 
     team_members = supabase.table('employee') \
         .select('staff_fname, staff_lname, staff_id, position, role, dept') \
@@ -178,8 +156,7 @@ def get_team_schedules():
                             'position': member['position'],
                             'startDate': datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
                             'endDate': datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
-                            'wfh': formatted_wfh_status,
-                            'reporting_manager': reporting_manager_name
+                            'wfh': formatted_wfh_status
                         })
 
             all_staff_data.append({
@@ -192,10 +169,9 @@ def get_team_schedules():
     return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})
 
 
-# # test http://127.0.0.1:5000/schedule/team_schedules?staff_id=140003
 
 
-
+#  # test http://127.0.0.1:5000/schedule/team_schedules?staff_id=140003
 
 
 
@@ -238,14 +214,10 @@ def get_all_schedules():
 
     for employee in employee_data.data:
         staff_id = employee['staff_id']
-        schedules = schedule_map.get(staff_id, [])
-        
-        schedules_list = []
-        
-        # Iterate over each schedule entry for the staff member
-        for schedule in schedules:
+        employee_schedules = schedule_map.get(staff_id, [])
+
+        for schedule in employee_schedules:
             starting_date = datetime.strptime(schedule['starting_date'], '%Y-%m-%d')
-            
             for day, offset in day_offsets.items():
                 wfh_status = schedule.get(day)
                 if wfh_status and wfh_status != "in_office":
@@ -253,27 +225,26 @@ def get_all_schedules():
                     day_date = starting_date + timedelta(days=offset)
                     start_date_str = f"{day_date.strftime('%Y-%m-%d')}T{start_time}+08:00"
                     end_date_str = f"{day_date.strftime('%Y-%m-%d')}T{end_time}+08:00"
+
+                    formatted_wfh_status = wfh_status_mappings.get(wfh_status, wfh_status)
                     
-                    schedules_list.append({
+                    all_schedules.append({
                         'staff_id': staff_id,
                         'dept': employee['dept'],
                         'position': employee['position'],
-                        'startDate': start_date_str,
-                        'endDate': end_date_str,
-                        'wfh': wfh_status_mappings.get(wfh_status, wfh_status),
-                        'reporting_manager': fetch_reporting_manager(employee['reporting_manager'])
+                        'startDate': datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
+                        'endDate': datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
+                        'wfh': formatted_wfh_status
                     })
 
-        all_schedules.extend(schedules_list)
         all_staff_data.append({
             'staff_name': f"{employee['staff_fname']} {employee['staff_lname']}",
             'staff_id': staff_id,
             'position': employee['position'],
-            'dept': employee['dept'],
+            'dept': employee['dept']
         })
 
     return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})
 
 
-
-#  test using http://127.0.0.1:5000/schedule/all_schedules
+ #  test using http://127.0.0.1:5000/schedule/all_schedules
