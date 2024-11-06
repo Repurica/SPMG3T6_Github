@@ -30,7 +30,7 @@ describe('ApplicationForm Component Tests', () => {
     cy.get('input[type="radio"][value="ad_hoc"]').check();
     cy.get('input[placeholder="Select a start date"]').click();
     cy.get('.react-datepicker__day--001').first().click(); // Select the first day of the month
-    cy.get('input[placeholder="Select a start date"]').should('have.value', '10/01/2024');
+    cy.get('input[placeholder="Select a start date"]').should('have.value', '11/01/2024');
   });
 
   it('should show error if reason is empty on submit', () => {
