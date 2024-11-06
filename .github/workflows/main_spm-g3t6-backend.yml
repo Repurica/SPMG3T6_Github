@@ -6,14 +6,19 @@ name: Build and deploy Python app to Azure Web App - SPM-G3T6-backend
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+    paths:
+      - 'backend/**'
   workflow_dispatch:
+
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
 
@@ -31,6 +36,8 @@ jobs:
         run: pip install -r requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+      - name: Run pytest
+        run: pytest
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
@@ -75,4 +82,3 @@ jobs:
         with:
           app-name: 'SPM-G3T6-backend'
           slot-name: 'Production'
-          
