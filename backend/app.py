@@ -22,7 +22,7 @@ app.register_blueprint(withdrawals, url_prefix="/withdrawals")
 
 @app.route('/')
 def home():
-    return "running!!"
+    return "running!!version 1"
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=8000)
