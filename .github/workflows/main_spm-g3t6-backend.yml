@@ -45,7 +45,7 @@ jobs:
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
-          name: python-app
+          name: backend/python-app
           path: release.zip
 
   deploy:
@@ -79,3 +79,10 @@ jobs:
         with:
           app-name: 'SPM-G3T6-backend'
           slot-name: 'Production'
+
+      - name: Verify deployment
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" ${{ steps.deploy-to-webapp.outputs.webapp-url }} | grep 200
+
+      - name: Clean up
+        run: rm -f release.zip
