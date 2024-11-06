@@ -118,7 +118,7 @@ function OwnRequests() {
          }
          console.log(toSend)         
          try {
-            const response = await fetch('http://localhost:5000/withdrawals/staff_store_withdrawal', {
+            const response = await fetch('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/withdrawals/staff_store_withdrawal', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ function OwnRequests() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await fetchWithRetry('http://localhost:5000/application/get_all_requests_staff', {
+                const response = await fetchWithRetry('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/get_all_requests_staff', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json', // Send JSON data

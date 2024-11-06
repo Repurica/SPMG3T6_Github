@@ -77,7 +77,7 @@ function ViewRequests() {
                 "outcome_reason" : reason      
              }         
              try {
-                const response = await fetch('http://localhost:5000/application/store_approval_rejection', {
+                const response = await fetch('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/store_approval_rejection', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ function ViewRequests() {
                 "outcome_reason" : reason      
              }          
              try {
-                const response = await fetch('http://localhost:5000/application/store_approval_rejection', {
+                const response = await fetch('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/store_approval_rejection', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ function ViewRequests() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await fetchWithRetry('http://localhost:5000/application/retrieve_pending_requests', {
+                const response = await fetchWithRetry('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/retrieve_pending_requests', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json', // Send JSON data

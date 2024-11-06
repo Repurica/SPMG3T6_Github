@@ -78,7 +78,7 @@ function WithdrawRequests() {
                 "withdrawal_id": selectedItem.withdrawal_id   
              }         
              try {
-                const response = await fetch('http://localhost:5000/withdrawals/manager_approve_reject_withdrawal', {
+                const response = await fetch('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/withdrawals/manager_approve_reject_withdrawal', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ function WithdrawRequests() {
                 "withdrawal_id": selectedItem.withdrawal_id   
              }          
              try {
-                const response = await fetch('http://localhost:5000/withdrawals/manager_approve_reject_withdrawal', {
+                const response = await fetch('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/withdrawals/manager_approve_reject_withdrawal', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ function WithdrawRequests() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await fetchWithRetry('http://localhost:5000/withdrawals/retrieve_withdrawals', {
+                const response = await fetchWithRetry('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/withdrawals/retrieve_withdrawals', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json', // Send JSON data
