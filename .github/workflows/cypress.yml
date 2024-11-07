@@ -42,10 +42,8 @@ jobs:
     #     wait-on: 'http://localhost:3000'
     #     config-file: cypress/e2e-config.json
 
-    - name: Run component tests
+    - name: Run Cypress component tests
       uses: cypress-io/github-action@v5
       with:
-        working-directory: frontend
-        start: npm start
-        wait-on: 'http://localhost:3000'
-        # config-file: cypress/component-config.json
+        browser: chrome
+        component: true
