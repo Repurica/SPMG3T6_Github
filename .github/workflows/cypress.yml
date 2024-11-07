@@ -47,3 +47,5 @@ jobs:
       with:
         browser: chrome
         component: true
+      env:
+        working-directory: frontend
