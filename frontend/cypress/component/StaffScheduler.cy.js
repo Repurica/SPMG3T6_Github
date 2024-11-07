@@ -8,10 +8,10 @@ describe('StaffScheduler Component Tests', () => {
     // cy.clock(date.getTime());
     sessionStorage.setItem('id', '140002');
     sessionStorage.setItem('role', '1');
-    cy.intercept('GET', 'http://127.0.0.1:5000/schedule/staff_schedules?staff_id=140002', {
+    cy.intercept('GET', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/schedule/staff_schedules?staff_id=140002', {
       fixture: 'ownSchedule.json'
     }).as('getOwnSchedule');
-    cy.intercept('GET', 'http://127.0.0.1:5000/schedule/team_schedules?staff_id=140002', {
+    cy.intercept('GET', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/schedule/team_schedules?staff_id=140002', {
       fixture: 'teamSchedule.json'
     }).as('getTeamSchedule');
     mount(<StaffScheduler />);

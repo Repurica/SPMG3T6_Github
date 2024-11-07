@@ -14,7 +14,7 @@ const LogIn = ({ onLogin }) => {
 
     // Simulate login process (replace with actual API call)
     try {
-      const response = await fetch('http://localhost:5000/application/get_role', {
+      const response = await fetch('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/get_role', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',

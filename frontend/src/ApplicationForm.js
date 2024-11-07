@@ -42,7 +42,7 @@ function ApplicationForm() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetchWithRetry('http://localhost:5000/application/available_dates', {
+        const response = await fetchWithRetry('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/available_dates', {
           method: 'POST', 
           headers: {
             'Content-Type': 'application/json', // Send JSON data
@@ -239,7 +239,7 @@ function ApplicationForm() {
       //submit
  
       try {
-        const response = await fetch('http://localhost:5000/application/store_application', {
+        const response = await fetch('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/store_application', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -1,10 +1,13 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
+
 name: Build and deploy Python app to Azure Web App - SPM-G3T6-backend
 
 on:
   push:
-    branches: [ "main" ]
-    paths:
-      - 'backend/**'
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -54,9 +57,7 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write
-
+    
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -66,23 +67,11 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_252375203F2248B9B12E4F095973CEAF }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_040CA488CC2849918EC2BBC7383C5C88 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5A66E3076AAD4FC985CF800346B82CAA }}
-
+      
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'SPM-G3T6-backend'
           slot-name: 'Production'
-
-      - name: Verify deployment
-        run: |
-          curl -s -o /dev/null -w "%{http_code}" ${{ steps.deploy-to-webapp.outputs.webapp-url }} | grep 200
-
-      - name: Clean up
-        run: rm -f release.zip
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_621200BD6C3A4126A84D6D0408CD1F71 }}
