@@ -1,0 +1,10 @@
+{
+    "component": {
+        "componentFolder": "./component",
+        "testFiles": "*.spec.js",
+        "devServer": {
+            "framework": "react",
+            "bundler": "webpack"
+        }
+    }
+}
