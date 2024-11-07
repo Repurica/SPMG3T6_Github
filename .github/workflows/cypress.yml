@@ -43,9 +43,6 @@ jobs:
     #     config-file: cypress/e2e-config.json
 
     - name: Run component tests
-      uses: cypress-io/github-action@v5
+      uses: cypress-io/github-action@v6
       with:
-        working-directory: frontend
-        start: npm start
-        wait-on: 'http://localhost:3000'
-        config-file: cypress/component-config.json
+        component: true
