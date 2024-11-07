@@ -5,11 +5,11 @@ import { mount } from 'cypress/react18';
 
 describe('OwnRequests Component', () => {
     beforeEach(() => {
-        cy.intercept('POST', 'http://localhost:5000/application/get_all_requests_staff', {
+        cy.intercept('POST', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/get_all_requests_staff', {
             fixture: 'ownRequests.json'
         }).as('getRequests');
         
-        // cy.intercept('POST', 'http://localhost:5000/withdrawals/staff_store_withdrawal', {
+        // cy.intercept('POST', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/withdrawals/staff_store_withdrawal', {
         //     statusCode: 200,
         //     body: { success: true }
         // }).as('withdrawRequest');

@@ -10,7 +10,7 @@ describe('WithdrawRequests Component', () => {
             requests = data;
         });
 
-        cy.intercept('POST', 'http://localhost:5000/withdrawals/retrieve_withdrawals', {
+        cy.intercept('POST', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/withdrawals/retrieve_withdrawals', {
             fixture: 'withdrawRequests.json',
         }).as('retrieveWithdrawRequests');
         mount(<WithdrawRequests />);

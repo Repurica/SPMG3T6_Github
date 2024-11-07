@@ -4,12 +4,12 @@ import ApplicationForm from '../../src/ApplicationForm';
 
 describe('ApplicationForm Component Tests', () => {
   beforeEach(() => {
-    cy.intercept('POST', 'http://localhost:5000/application/available_dates', {
+    cy.intercept('POST', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/available_dates', {
       statusCode: 200,
       body: { results: [] },
     }).as('fetchAvailableDates');
 
-    cy.intercept('POST', 'http://localhost:5000/application/store_application', {
+    cy.intercept('POST', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/store_application', {
       statusCode: 200,
       body: { message: 'Success' },
     }).as('storeApplication');
