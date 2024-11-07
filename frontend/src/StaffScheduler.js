@@ -54,6 +54,7 @@ function StaffScheduler() {
                     }, 3, 1000);  // Fetch Team Schedule
                 } else {
                     const url = `http://127.0.0.1:5000/schedule/team_schedules?staff_id=${id}`;
+                    console.log(url);
                     teamResponse = await fetchWithRetry(url, {
                             method: 'GET'
                         }, 3, 1000);  // 3 retries with a 1 second delay
@@ -96,7 +97,7 @@ function StaffScheduler() {
         } else if (currentResource === 'Team Schedule') {
             schedule = teamSchedule.filter(item => new Date(item.startDate).setHours(0, 0, 0, 0) >= new Date(startDate).setHours(0, 0, 0, 0) 
             && new Date(item.startDate).setHours(0, 0, 0, 0) <= new Date(endDate).setHours(0, 0, 0, 0))
-            .filter(item => item.staff_id === id);
+            .filter(item => item.staff_id !== Number(id));
         }
 
         if (selectedDept === 'All') {
