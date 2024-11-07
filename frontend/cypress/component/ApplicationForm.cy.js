@@ -4,12 +4,12 @@ import ApplicationForm from '../../src/ApplicationForm';
 
 describe('ApplicationForm Component Tests', () => {
   beforeEach(() => {
-    cy.intercept('POST', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/available_dates', {
+    cy.intercept('POST', 'https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/available_dates', {
       statusCode: 200,
       body: { results: [] },
     }).as('fetchAvailableDates');
 
-    cy.intercept('POST', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/store_application', {
+    cy.intercept('POST', 'https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/store_application', {
       statusCode: 200,
       body: { message: 'Success' },
     }).as('storeApplication');
@@ -46,7 +46,7 @@ describe('ApplicationForm Component Tests', () => {
   it('should submit the form successfully', () => {
     cy.get('input[type="radio"][value="ad_hoc"]').check();
     cy.get('input[placeholder="Select a start date"]').click();
-    cy.get('.react-datepicker__day--001').first().click();
+    cy.get('.react-datepicker__day--004').first().click();
     cy.get('textarea').type('Test reason');
     cy.get('input[type="radio"][value="full_day"]').check();
     cy.get('button[type="submit"]').click();

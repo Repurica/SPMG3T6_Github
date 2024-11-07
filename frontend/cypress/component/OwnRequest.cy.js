@@ -5,7 +5,7 @@ import { mount } from 'cypress/react18';
 
 describe('OwnRequests Component', () => {
     beforeEach(() => {
-        cy.intercept('POST', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/get_all_requests_staff', {
+        cy.intercept('POST', 'https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/get_all_requests_staff', {
             fixture: 'ownRequests.json'
         }).as('getRequests');
         

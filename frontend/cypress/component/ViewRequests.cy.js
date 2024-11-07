@@ -10,7 +10,7 @@ describe('ViewRequests Component', () => {
             requests = data;
         });
 
-        cy.intercept('POST', 'http://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/retrieve_pending_requests', {
+        cy.intercept('POST', 'https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/application/retrieve_pending_requests', {
             fixture: 'viewRequests.json',
         }).as('retrieveRequests');
         mount(<ViewRequests />);
