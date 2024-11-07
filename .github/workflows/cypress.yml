@@ -45,4 +45,7 @@ jobs:
     - name: Run component tests
       uses: cypress-io/github-action@v6
       with:
+        working-directory: frontend
+        start: npm start
+        wait-on: 'http://localhost:3000'
         component: true
