@@ -6,8 +6,10 @@ name: Build and deploy Python app to Azure Web App - SPM-G3T6-backend
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/main_spm-g3t6-backend.yml'
   workflow_dispatch:
 
 jobs:
