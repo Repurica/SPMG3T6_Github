@@ -1,4 +1,4 @@
-# SPMG3T6_Github set-up/running of application instructions
+# SPMG3T6_Github set-up/accessing application instructions
 For frontend ReactJs application:
 1. Unzip the zipped source files and open the folder in VSCode/navigate to its directory in command line/cmd.
 2.Type "cd frontend" in the terminal (vscode terminal/command line)
@@ -18,7 +18,7 @@ For backend Flask application:
 3. pip install -U pytest (for unit tests using pytest)
 4. pip install flask (for backend flask application)
 
-5. To run the backend flask application, type:
+5. To run the backend flask application, open another terminal, and type:
    "cd backend" in the terminal
    "python app.py" in the terminal
 
