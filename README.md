@@ -4,47 +4,64 @@
 
 Please ensure port 3000 and port 8000 are not in use as they are the ports to be used for our frontend and backend applications.
 
-## For Frontend ReactJs Application:
+## Link to Live Application
 
-1. Unzip the zipped source files and open the folder in VSCode or navigate to its directory in the command line/cmd.
-2. Type `cd frontend` in the terminal (VSCode terminal/command line).
-3. In the terminal, type:
+- **Frontend:** [https://spmg-3-t6-github.vercel.app/](https://spmg-3-t6-github.vercel.app/)
+- **Backend:** [https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net](https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net)
+
+## Initial Setup
+
+1. Download the source code as a zip file.
+2. Open a terminal and navigate to the `SPMG3T6_Github-main` folder.
+
+## Frontend ReactJs Application
+
+1. In the terminal, navigate to the `frontend` folder.
+2. Install necessary dependencies:
    ```sh
    npm install
-   ```
-   (to install all dependencies)
-   
-   To install dependencies separately, type in the terminal:
+   3. To run the frontend application, type in the terminal:
+      ```sh
+      npm start
+      ```
+      The application will run at [http://localhost:3000](http://localhost:3000).
+
+### Login Credentials
+
+#### Staff
+- **Username:** 140002
+- **Password:** 12345
+
+#### HR/Senior
+- **Username:** 180001
+- **Password:** 12345
+
+#### Manager
+- **Username:** 140894
+- **Password:** 12345
+
+4. To run tests for the frontend application, type in the terminal:
    ```sh
-   npm i devextreme-react
-   npm install react-datepicker
-   npm install react-router-dom
-   ```
-4. To run the frontend application, type in the terminal:
-   ```sh
-   npm run start
+   npm run cypress:run
    ```
 
-## For Backend Flask Application:
+## Backend Flask Application
 
-1. Install Supabase for connection to Supabase:
+1. In the terminal, navigate to the `frontend` folder.
+
+
+
+2. Create local python environment:
    ```sh
-   pip install supabase
+   python -m venv env
+   .\env\Scripts\activate
    ```
-2. Install the coverage tool:
+
+3. Install necessary dependencies
+   pip install -r requirements.txt 
+
+
+4. To run the backend Flask application, open another terminal and type:
    ```sh
-   python3 -m pip install coverage
-   ```
-3. Install pytest for unit tests:
-   ```sh
-   pip install -U pytest
-   ```
-4. Install Flask for the backend application:
-   ```sh
-   pip install flask
-   ```
-5. To run the backend Flask application, open another terminal and type:
-   ```sh
-   cd backend
    python app.py
    ```
