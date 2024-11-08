@@ -29,7 +29,7 @@ Please ensure port 3000 and port 8000 are not in use as they are the ports to be
 
 4. To run tests for the frontend application, type in the terminal:
    ```sh
-   npm run cypress:run
+   npx cypress run --component
    ```
 
 ### Login Credentials
