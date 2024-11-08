@@ -52,6 +52,11 @@ function StaffScheduler() {
                     teamResponse = await fetchWithRetry('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/schedule/all_schedules', {
                         method: 'GET'
                     }, 3, 1000);  // Fetch Team Schedule
+                } else if (role === '3') {
+                    const url = `https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/schedule/manager_team_schedules?staff_id=${id}`;
+                    teamResponse = await fetchWithRetry(url, {
+                            method: 'GET'
+                        }, 3, 1000);  // 3 retries with a 1 second delay
                 } else {
                     const url = `https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/schedule/team_schedules?staff_id=${id}`;
                     teamResponse = await fetchWithRetry(url, {
