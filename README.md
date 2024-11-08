@@ -1,4 +1,6 @@
-# SPMG3T6_Github set-up/accessing application instructions
+# SPMG3T6_Github set-up/accessing application instructions (to access it locally, for deployment, you just need to visit the deployment link)
+
+Please ensure port 3000, and port 8000 are not in use as they are the ports to be used for our frontend and backend applications.
 For frontend ReactJs application:
 1. Unzip the zipped source files and open the folder in VSCode/navigate to its directory in command line/cmd.
 2.Type "cd frontend" in the terminal (vscode terminal/command line)
