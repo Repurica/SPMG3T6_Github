@@ -51,17 +51,21 @@ function StaffScheduler() {
                 if (role === '1') {
                     teamResponse = await fetchWithRetry('https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/schedule/all_schedules', {
                         method: 'GET'
-                    }, 3, 1000);  // Fetch Team Schedule
+                    }, 3, 1000);  // 3 retries with a 1 second delay
+                } else if (role === '2') {
+                    const url = `https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/schedule/team_schedules?staff_id=${id}`;
+                    teamResponse = await fetchWithRetry(url, {
+                            method: 'GET'
+                        }, 3, 1000);  
                 } else {
                     const url = `https://spm-g3t6-backend-a7e4exepbuewg4hw.southeastasia-01.azurewebsites.net/schedule/team_schedules?staff_id=${id}`;
                     teamResponse = await fetchWithRetry(url, {
                             method: 'GET'
-                        }, 3, 1000);  // 3 retries with a 1 second delay
+                        }, 3, 1000);  
                 }
                 const teamData = await teamResponse.json();
                 setTeamSchedule(teamData.schedules);  
                 setStaffData(teamData.staff_data);  
-                console.log(teamSchedule)
             } catch (error) {
                 console.log('Error fetching own schedules:', error.message);
             }
@@ -83,7 +87,6 @@ function StaffScheduler() {
         currentDate.setHours(0, 0, 0, 0)
         currentDate.setMonth(currentDate.getMonth() + 3); 
         setEndDate(currentDate.toDateString()); 
-        // console.log(endDate)
       }, []);
 
     // Choose own/team schedules based on current resource selection
@@ -116,8 +119,6 @@ function StaffScheduler() {
             staff_display: `${item.staff_name} (${item.position})`
           }));
 
-        console.log(staff)
-
         if (selectedDept === 'All') {
             return staff
         } else {
@@ -128,7 +129,6 @@ function StaffScheduler() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const handleDateChange = (newDate) => {
         setSelectedDate(newDate);
-        console.log(newDate)
     };
 
     const isSameDay = (date1, date2) => {
