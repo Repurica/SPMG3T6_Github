@@ -9,12 +9,14 @@ from datetime import datetime, timedelta
 
 schedule = Blueprint('schedule', __name__)
 
-# Helper function to fetch employee details
+
 def fetch_employee_details(staff_id):
     return supabase.table('employee') \
-        .select('staff_fname, staff_lname, staff_id, dept, position, reporting_manager') \
+        .select('staff_fname, staff_lname, staff_id, dept, position, reporting_manager, role') \
         .eq('staff_id', staff_id) \
         .execute()
+
+
 
 # Helper function to fetch schedules for an employee
 def fetch_schedules(staff_id):
@@ -85,6 +87,8 @@ def get_staff_schedules():
 
     return jsonify({"schedules": schedules_list, "staff_data": staff_info})
 
+
+# test using http://127.0.0.1:8000/schedule/staff_schedules?staff_id=140003
 
 
 
@@ -170,7 +174,104 @@ def get_team_schedules():
 
 
 
-#  # test http://127.0.0.1:5000/schedule/team_schedules?staff_id=140003
+#  # test http://127.0.0.1:8000/schedule/team_schedules?staff_id=140003
+
+
+
+
+
+
+
+# route for managers to get schedules of all their team members
+@schedule.route('/manager_team_schedules', methods=['GET'])
+def get_manager_team_schedules():
+    manager_id = request.args.get('staff_id')
+    staff_data = fetch_employee_details(manager_id)
+
+    if not staff_data.data:
+        return jsonify({"error": "No manager found with this ID."}), 404
+
+    # Check if the role is Manager (role = 3)
+    role = staff_data.data[0].get('role')
+    if role != 3:
+        return jsonify({"error": "Access denied. Only managers are authorised for this route."}), 403
+
+    # Fetch all team members who report to this manager
+    team_members = supabase.table('employee') \
+        .select('staff_fname, staff_lname, staff_id, position, role, dept') \
+        .eq('reporting_manager', manager_id) \
+        .execute()
+
+    if not team_members.data:
+        return jsonify({"error": "No team members found for this manager."}), 404
+
+    # Define time ranges and WFH status mappings
+    time_ranges = {
+        'AM': ("09:00:00", "13:00:00"),
+        'PM': ("14:00:00", "18:00:00"),
+        'full_day': ("09:00:00", "18:00:00"),
+        'in_office': ("09:00:00", "18:00:00")
+    }
+    wfh_status_mappings = {
+        'AM': "AM WFH",
+        'PM': "PM WFH",
+        'full_day': "Full Day WFH"
+    }
+
+    day_offsets = {
+        'monday': 0,
+        'tuesday': 1,
+        'wednesday': 2,
+        'thursday': 3,
+        'friday': 4,
+    }
+
+    all_schedules = []
+    all_staff_data = []
+
+    # Iterate over each team member and fetch their schedules
+    for member in team_members.data:
+        member_id = member['staff_id']
+        schedules = fetch_schedules(member_id)
+
+        if schedules.data:
+            for schedule in schedules.data:
+                starting_date = datetime.strptime(schedule['starting_date'], '%Y-%m-%d')
+                for day, offset in day_offsets.items():
+                    wfh_status = schedule.get(day)
+                    if wfh_status and wfh_status != "in_office":
+                        start_time, end_time = time_ranges.get(wfh_status, ("09:00:00", "18:00:00"))
+                        day_date = starting_date + timedelta(days=offset)
+                        start_date_str = f"{day_date.strftime('%Y-%m-%d')}T{start_time}+08:00"
+                        end_date_str = f"{day_date.strftime('%Y-%m-%d')}T{end_time}+08:00"
+
+                        # Map the WFH status to the appropriate wording
+                        formatted_wfh_status = wfh_status_mappings.get(wfh_status, wfh_status)
+
+                        all_schedules.append({
+                            'staff_id': member['staff_id'],
+                            'dept': member['dept'],
+                            'startDate': datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
+                            'endDate': datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S%z').isoformat(),
+                            'wfh': formatted_wfh_status
+                        })
+
+            all_staff_data.append({
+                'staff_name': f"{member['staff_fname']} {member['staff_lname']}",
+                'staff_id': member['staff_id'],
+                'position': member['position'],
+                'dept': member['dept']
+            })
+
+    return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})
+
+# test using http://127.0.0.1:8000/schedule/manager_team_schedules?staff_id=140894
+
+
+
+
+
+
 
 
 
@@ -246,4 +347,4 @@ def get_all_schedules():
     return jsonify({"schedules": all_schedules, "staff_data": all_staff_data})
 
 
- #  test using http://127.0.0.1:5000/schedule/all_schedules
+ #  test using http://127.0.0.1:8000/schedule/all_schedules
