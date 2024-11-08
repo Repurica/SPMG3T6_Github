@@ -20,11 +20,17 @@ Please ensure port 3000 and port 8000 are not in use as they are the ports to be
 2. Install necessary dependencies:
    ```sh
    npm install
-   3. To run the frontend application, type in the terminal:
-      ```sh
-      npm start
-      ```
-      The application will run at [http://localhost:3000](http://localhost:3000).
+   ```
+3. To run the frontend application, type in the terminal:
+   ```sh
+   npm start
+   ```
+   The application will run at [http://localhost:3000](http://localhost:3000).
+
+4. To run tests for the frontend application, type in the terminal:
+   ```sh
+   npm run cypress:run
+   ```
 
 ### Login Credentials
 
@@ -40,27 +46,18 @@ Please ensure port 3000 and port 8000 are not in use as they are the ports to be
 - **Username:** 140894
 - **Password:** 12345
 
-4. To run tests for the frontend application, type in the terminal:
-   ```sh
-   npm run cypress:run
-   ```
-
 ## Backend Flask Application
 
-1. In the terminal, navigate to the `frontend` folder.
-
-
-
-2. Create local python environment:
+1. In the terminal, navigate to the `backend` folder.
+2. Create a local python environment:
    ```sh
    python -m venv env
    .\env\Scripts\activate
    ```
-
-3. Install necessary dependencies
-   pip install -r requirements.txt 
-
-
+3. Install necessary dependencies:
+   ```sh
+   pip install -r requirements.txt
+   ```
 4. To run the backend Flask application, open another terminal and type:
    ```sh
    python app.py
