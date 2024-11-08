@@ -61,7 +61,6 @@ function StaffScheduler() {
                 const teamData = await teamResponse.json();
                 setTeamSchedule(teamData.schedules);  
                 setStaffData(teamData.staff_data);  
-                console.log(teamSchedule)
             } catch (error) {
                 console.log('Error fetching own schedules:', error.message);
             }
@@ -70,20 +69,19 @@ function StaffScheduler() {
     }, [id]);
 
     useEffect(() => {
-    //   const currentDate = new Date();
-      const currentDate = new Date('2024-10-20'); // for testing
+      const currentDate = new Date();
+    //   const currentDate = new Date('2024-10-20'); // for testing
       currentDate.setHours(0, 0, 0, 0)
       currentDate.setMonth(currentDate.getMonth() - 2); 
       setStartDate(currentDate.toDateString()); 
     }, []);
 
     useEffect(() => {
-        // const currentDate = new Date();
-        const currentDate = new Date('2024-10-20'); // for testing
+        const currentDate = new Date();
+        // const currentDate = new Date('2024-10-20'); // for testing
         currentDate.setHours(0, 0, 0, 0)
         currentDate.setMonth(currentDate.getMonth() + 3); 
         setEndDate(currentDate.toDateString()); 
-        // console.log(endDate)
       }, []);
 
     // Choose own/team schedules based on current resource selection
@@ -116,8 +114,6 @@ function StaffScheduler() {
             staff_display: `${item.staff_name} (${item.position})`
           }));
 
-        console.log(staff)
-
         if (selectedDept === 'All') {
             return staff
         } else {
@@ -128,7 +124,6 @@ function StaffScheduler() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const handleDateChange = (newDate) => {
         setSelectedDate(newDate);
-        console.log(newDate)
     };
 
     const isSameDay = (date1, date2) => {
