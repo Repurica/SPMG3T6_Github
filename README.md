@@ -1,6 +1,6 @@
 # SPMG3T6_Github Set-Up/Accessing Application Instructions
 
-(To access it locally. For deployment, you just need to visit the deployment link.)
+
 
 Please ensure port 3000 and port 8000 are not in use as they are the ports to be used for our frontend and backend applications.
 
@@ -35,16 +35,16 @@ Please ensure port 3000 and port 8000 are not in use as they are the ports to be
 ### Login Credentials
 
 #### Staff
-- **Username:** 140002
-- **Password:** 12345
+- **Username:** `140002`
+- **Password:** `12345`
 
 #### HR/Senior
-- **Username:** 180001
-- **Password:** 12345
+- **Username:** `180001`
+- **Password:** `12345`
 
 #### Manager
-- **Username:** 140894
-- **Password:** 12345
+- **Username:** `140894`
+- **Password:** `12345`
 
 ## Backend Flask Application
 
@@ -61,4 +61,15 @@ Please ensure port 3000 and port 8000 are not in use as they are the ports to be
 4. To run the backend Flask application, open another terminal and type:
    ```sh
    python app.py
+   ```
+   The application will run at [http://localhost:8000](http://localhost:8000).
+
+5. To run test cases, type:
+   ```sh
+   pytest
+   ```
+
+### Sample API Endpoint
+   ```sh
+   http://localhost:8000/schedule/staff_schedules?staff_id=140002
    ```
